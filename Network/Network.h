@@ -18,6 +18,7 @@ namespace MOONG
 		{
 		public:
 			BOOL InternetConnected();
+			// TODO: std::string을 CStringA로 변경.
 			BOOL InternetConnected(std::string param_url);
 			BOOL Ping(std::string ip);
 		protected:
