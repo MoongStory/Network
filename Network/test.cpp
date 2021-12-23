@@ -1,4 +1,5 @@
 #include <iostream>
+#include <atlstr.h>
 
 #include "Network.h"
 
@@ -6,9 +7,9 @@ int main()
 {
 	MOONG::NETWORK::Network network;
 
-	const std::string URL = "https://www.google.com";
+	const CStringA URL = "https://www.google.com";
 
-	const std::string IP = "142.251.42.208";
+	const CStringA IP = "142.251.42.208";
 
 	if (network.InternetConnected())
 	{

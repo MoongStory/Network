@@ -13,13 +13,13 @@ BOOL MOONG::NETWORK::Network::InternetConnected()
 	return ::InternetGetConnectedStateEx(&dwFlag, szName, 256, 0);
 }
 
-BOOL MOONG::NETWORK::Network::InternetConnected(std::string param_url)
+BOOL MOONG::NETWORK::Network::InternetConnected(CStringA param_url)
 {
 #ifdef _UNICODE
-	const size_t new_size_w = strlen(param_url.c_str()) + 1;
+	const size_t new_size_w = strlen(param_url.GetBuffer()) + 1;
 	size_t converted_chars = 0;
 	wchar_t* url = new wchar_t[new_size_w];
-	mbstowcs_s(&converted_chars, url, new_size_w, param_url.c_str(), _TRUNCATE);
+	mbstowcs_s(&converted_chars, url, new_size_w, param_url.GetBuffer(), _TRUNCATE);
 #elif _MBCS
 	const size_t new_size = (strlen(param_url.c_str()) + 1) * 2;
 	char* url = new char[new_size];
@@ -29,11 +29,11 @@ BOOL MOONG::NETWORK::Network::InternetConnected(std::string param_url)
 	return InternetCheckConnection(url, FLAG_ICC_FORCE_CONNECTION, NULL);
 }
 
-BOOL MOONG::NETWORK::Network::Ping(std::string ip)
+BOOL MOONG::NETWORK::Network::Ping(CStringA IP)
 {
-	std::string command = "ping -n 1 " + ip;
+	CStringA command = "ping -n 1 " + IP;
 	
- 	FILE* file = _popen(command.data(), "r");
+ 	FILE* file = _popen(command.GetBuffer(), "r");
 
 	char output[300] = {0};
  	fread(output, 1, sizeof(output), file);
@@ -42,9 +42,9 @@ BOOL MOONG::NETWORK::Network::Ping(std::string ip)
 
 	fclose(file);
 
-	std::string response_msg = ip + "의 응답";
+	CStringA response_msg = IP + "의 응답";
 
-	if(strstr(output, response_msg.data()))
+	if(strstr(output, response_msg.GetBuffer()))
 	{
 		return TRUE;
 	}
