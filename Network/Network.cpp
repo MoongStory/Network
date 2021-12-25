@@ -5,7 +5,7 @@
 
 #include <stdlib.h>
 
-BOOL MOONG::NETWORK::Network::InternetConnected()
+BOOL MOONG::NETWORK::Network::InternetConnected() const
 {
 	DWORD dwFlag = 0;
 	TCHAR szName[256] = {0};
@@ -13,7 +13,7 @@ BOOL MOONG::NETWORK::Network::InternetConnected()
 	return ::InternetGetConnectedStateEx(&dwFlag, szName, 256, 0);
 }
 
-BOOL MOONG::NETWORK::Network::InternetConnected(CStringA param_url)
+BOOL MOONG::NETWORK::Network::InternetConnected(CStringA param_url) const
 {
 #ifdef _UNICODE
 	const size_t new_size_w = strlen(param_url.GetBuffer()) + 1;
@@ -29,7 +29,7 @@ BOOL MOONG::NETWORK::Network::InternetConnected(CStringA param_url)
 	return InternetCheckConnection(url, FLAG_ICC_FORCE_CONNECTION, NULL);
 }
 
-BOOL MOONG::NETWORK::Network::Ping(CStringA IP)
+BOOL MOONG::NETWORK::Network::Ping(CStringA IP) const
 {
 	CStringA command = "ping -n 1 " + IP;
 	

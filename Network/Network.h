@@ -16,9 +16,9 @@ namespace MOONG
 		class Network
 		{
 		public:
-			BOOL InternetConnected();
-			BOOL InternetConnected(CStringA param_url);
-			BOOL Ping(CStringA IP);
+			BOOL InternetConnected() const;
+			BOOL InternetConnected(CStringA param_url) const;
+			BOOL Ping(CStringA IP) const;
 		protected:
 		private:
 		};
