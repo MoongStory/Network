@@ -29,7 +29,7 @@ BOOL MOONG::NETWORK::Network::InternetConnected(CStringA param_url) const
 	return InternetCheckConnection(url, FLAG_ICC_FORCE_CONNECTION, NULL);
 }
 
-BOOL MOONG::NETWORK::Network::Ping(CStringA IP) const
+BOOL MOONG::NETWORK::Network::Ping(const CStringA IP) const
 {
 	CStringA command = "ping -n 1 " + IP;
 	
