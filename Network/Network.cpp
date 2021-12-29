@@ -16,10 +16,10 @@ BOOL MOONG::NETWORK::Network::InternetConnected() const
 BOOL MOONG::NETWORK::Network::InternetConnected(CStringA param_url) const
 {
 #ifdef _UNICODE
-	const size_t new_size_w = strlen(param_url.GetBuffer()) + 1;
+	const size_t new_size_w = strlen(param_url.GetString()) + 1;
 	size_t converted_chars = 0;
 	wchar_t* url = new wchar_t[new_size_w];
-	mbstowcs_s(&converted_chars, url, new_size_w, param_url.GetBuffer(), _TRUNCATE);
+	mbstowcs_s(&converted_chars, url, new_size_w, param_url.GetString(), _TRUNCATE);
 #elif _MBCS
 	const size_t new_size = (strlen(param_url.c_str()) + 1) * 2;
 	char* url = new char[new_size];
@@ -33,7 +33,7 @@ BOOL MOONG::NETWORK::Network::Ping(const CStringA IP) const
 {
 	CStringA command = "ping -n 1 " + IP;
 	
- 	FILE* file = _popen(command.GetBuffer(), "r");
+ 	FILE* file = _popen(command.GetString(), "r");
 
 	char output[300] = {0};
  	fread(output, 1, sizeof(output), file);
@@ -44,7 +44,7 @@ BOOL MOONG::NETWORK::Network::Ping(const CStringA IP) const
 
 	CStringA response_msg = IP + "¿« ¿¿¥‰";
 
-	if(strstr(output, response_msg.GetBuffer()))
+	if(strstr(output, response_msg.GetString()))
 	{
 		return TRUE;
 	}
