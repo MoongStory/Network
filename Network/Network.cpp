@@ -42,7 +42,7 @@ BOOL MOONG::NETWORK::Network::Ping(const CStringA IP) const
 
 	fclose(file);
 
-	CStringA response_msg = IP + "의 응답";
+	CStringA response_msg = IP + "의 응답: 바이트=";
 
 	if(strstr(output, response_msg.GetString()))
 	{
