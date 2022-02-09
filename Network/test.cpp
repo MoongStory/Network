@@ -29,7 +29,7 @@ int main()
 		std::cout << "fail, InternetConnected(" << URL << ")" << std::endl;
 	}
 
-	if (network.Ping(IP))
+	if (network.Ping(IP) ==  MOONG::NETWORK::RETURN::SUCCESS)
 	{
 		std::cout << "success, Ping(" << IP << ")" << std::endl;
 	}

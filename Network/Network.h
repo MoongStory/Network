@@ -7,18 +7,40 @@
 #ifndef _NETWORK_H_
 #define _NETWORK_H_
 
+#if _MSC_VER > 1200
 #include <atlstr.h>
+#else
+#include <iostream>
+#endif
 
 namespace MOONG
 {
 	namespace NETWORK
 	{
+		namespace RETURN
+		{
+			const int SUCCESS = 0;
+
+			namespace FAILURE
+			{
+				const int CREATE_PIPE = 1;
+				const int CREATE_PROCESS = 2;
+				const int PING = 3;
+			}
+		}
+
 		class Network
 		{
 		public:
+#if _MSC_VER > 1200
 			BOOL InternetConnected() const;
-			BOOL InternetConnected(CStringA param_url) const;
-			BOOL Ping(const CStringA IP) const;
+			BOOL InternetConnected(const CStringA param_url) const;
+			int Ping(const CStringA IP) const;
+#else
+			bool InternetConnected() const;
+			bool InternetConnected(const std::string param_url) const;
+			int Ping(const std::string IP) const;
+#endif
 		protected:
 		private:
 		};
