@@ -45,13 +45,67 @@ int MOONG::NETWORK::Network::Ping(const std::string IP) const
 {
 #if _MSC_VER > 1200
 	CStringA command = "ping -n 1 " + IP;
-
-	CStringA strResult;
 #else
 	std::string command = "ping -n 1 " + IP;
+#endif
 
 	std::string strResult;
+	
+#if _MSC_VER > 1200
+	ExecCommand(command.GetString(), strResult);
+#else
+	ExecCommand(command, strResult);
 #endif
+
+	// Case 0 (성공)
+	// Ping 172.20.25.130 32바이트 데이터 사용:
+	// 172.20.25.130의 응답: 바이트=32 시간<1ms TTL=63
+
+	// 172.20.25.130에 대한 Ping 통계:
+	//     패킷: 보냄 = 1, 받음 = 1, 손실 = 0 (0% 손실),
+	// 왕복 시간(밀리초):
+	//     최소 = 0ms, 최대 = 0ms, 평균 = 0ms
+
+
+
+	// Case 1 (실패)
+	// Ping 172.20.25.130 32바이트 데이터 사용:
+	// 172.20.25.30의 응답: 대상 호스트에 연결할 수 없습니다.
+
+	// 172.20.25.130에 대한 Ping 통계:
+	//     패킷: 보냄 = 1, 받음 = 1, 손실 = 0 (0% 손실),
+
+
+
+	// Case 2 (실패)
+	// Ping 172.20.25.130 32바이트 데이터 사용:
+	// PING: 전송하지 못했습니다. 일반 오류입니다.
+
+	// 172.20.25.130에 대한 Ping 통계:
+	//     패킷: 보냄 = 1, 받음 = 0, 손실 = 1 (100% 손실),
+
+#if _MSC_VER > 1200
+	CStringA response_msg = IP + "의 응답: 바이트=";
+#else
+	std::string response_msg = IP + "의 응답: 바이트=";
+#endif
+
+#if _MSC_VER > 1200
+	if (strstr(strResult.c_str(), response_msg.GetString()))
+#else
+	if (strstr(strResult.c_str(), response_msg.c_str()))
+#endif
+	{
+		return MOONG::NETWORK::RETURN::SUCCESS;
+	}
+	else
+	{
+		return MOONG::NETWORK::RETURN::FAILURE::PING;
+	}
+}
+
+int MOONG::NETWORK::Network::ExecCommand(const std::string command, std::string& output) const
+{
 	HANDLE hPipeRead, hPipeWrite;
 
 	SECURITY_ATTRIBUTES saAttr = { sizeof(SECURITY_ATTRIBUTES) };
@@ -73,11 +127,8 @@ int MOONG::NETWORK::Network::Ping(const std::string IP) const
 
 	PROCESS_INFORMATION pi = { 0 };
 
-#if _MSC_VER > 1200
-	BOOL fSuccess = CreateProcessA(NULL, (char*)command.GetString(), NULL, NULL, TRUE, CREATE_NEW_CONSOLE, NULL, NULL, &si, &pi);
-#else
 	BOOL fSuccess = CreateProcessA(NULL, (char*)(command.c_str()), NULL, NULL, TRUE, CREATE_NEW_CONSOLE, NULL, NULL, &si, &pi);
-#endif
+
 	if (!fSuccess)
 	{
 		CloseHandle(hPipeWrite);
@@ -117,58 +168,14 @@ int MOONG::NETWORK::Network::Ping(const std::string IP) const
 			}
 
 			buf[dwRead] = 0;
-			strResult += buf;
+			output += buf;
 		}
-	} //for
+	}
 
 	CloseHandle(hPipeWrite);
 	CloseHandle(hPipeRead);
 	CloseHandle(pi.hProcess);
 	CloseHandle(pi.hThread);
 
-	// Case 0 (성공)
-	// Ping 172.20.25.130 32바이트 데이터 사용:
-	// 172.20.25.130의 응답: 바이트=32 시간<1ms TTL=63
-
-	// 172.20.25.130에 대한 Ping 통계:
-	//     패킷: 보냄 = 1, 받음 = 1, 손실 = 0 (0% 손실),
-	// 왕복 시간(밀리초):
-	//     최소 = 0ms, 최대 = 0ms, 평균 = 0ms
-
-
-
-	// Case 1 (실패)
-	// Ping 172.20.25.130 32바이트 데이터 사용:
-	// 172.20.25.30의 응답: 대상 호스트에 연결할 수 없습니다.
-
-	// 172.20.25.130에 대한 Ping 통계:
-	//     패킷: 보냄 = 1, 받음 = 1, 손실 = 0 (0% 손실),
-
-
-
-	// Case 2 (실패)
-	// Ping 172.20.25.130 32바이트 데이터 사용:
-	// PING: 전송하지 못했습니다. 일반 오류입니다.
-
-	// 172.20.25.130에 대한 Ping 통계:
-	//     패킷: 보냄 = 1, 받음 = 0, 손실 = 1 (100% 손실),
-
-#if _MSC_VER > 1200
-	CStringA response_msg = IP + "의 응답: 바이트=";
-#else
-	std::string response_msg = IP + "의 응답: 바이트=";
-#endif
-
-#if _MSC_VER > 1200
-	if (strstr(strResult.GetString(), response_msg.GetString()))
-#else
-	if (strstr(strResult.c_str(), response_msg.c_str()))
-#endif
-	{
-		return MOONG::NETWORK::RETURN::SUCCESS;
-	}
-	else
-	{
-		return MOONG::NETWORK::RETURN::FAILURE::PING;
-	}
+	return EXIT_SUCCESS;
 }

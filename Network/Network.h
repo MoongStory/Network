@@ -7,10 +7,10 @@
 #ifndef _NETWORK_H_
 #define _NETWORK_H_
 
+#include <iostream>
+
 #if _MSC_VER > 1200
 #include <atlstr.h>
-#else
-#include <iostream>
 #endif
 
 namespace MOONG
@@ -53,6 +53,7 @@ namespace MOONG
 #endif
 		protected:
 		private:
+			int ExecCommand(const std::string command, std::string& output) const;
 		};
 	}
 }
