@@ -50,11 +50,21 @@ int MOONG::NETWORK::Network::Ping(const std::string IP) const
 #endif
 
 	std::string strResult;
+
+	int return_value = 0;
 	
 #if _MSC_VER > 1200
-	ExecCommand(command.GetString(), strResult);
+	return_value = ExecCommand(command.GetString(), strResult);
+	if(return_value != EXIT_SUCCESS)
+	{
+		return return_value;
+	}
 #else
-	ExecCommand(command, strResult);
+	return_value = ExecCommand(command, strResult);
+	if(return_value != EXIT_SUCCESS)
+	{
+		return return_value;
+	}
 #endif
 
 	// Case 0 (¼º°ø)
