@@ -8,11 +8,7 @@
 
 #include <stdexcept>
 
-#if _MSC_VER > 1200
-BOOL MOONG::NETWORK::Network::InternetConnected() const
-#else
 bool MOONG::NETWORK::Network::InternetConnected() const
-#endif
 {
 	DWORD dwFlag = 0;
 	TCHAR szName[256] = { 0 };
@@ -24,48 +20,24 @@ bool MOONG::NETWORK::Network::InternetConnected() const
 #endif
 }
 
-#if _MSC_VER > 1200
-BOOL MOONG::NETWORK::Network::InternetConnected(const CStringA param_url) const
-#else
 bool MOONG::NETWORK::Network::InternetConnected(const std::string param_url) const
-#endif
 {
-#if _MSC_VER > 1200
-	return InternetCheckConnectionA(param_url.GetString(), FLAG_ICC_FORCE_CONNECTION, NULL);
-#else
 	return InternetCheckConnectionA(param_url.c_str(), FLAG_ICC_FORCE_CONNECTION, NULL) ? true : false;
-#endif
 }
 
-#if _MSC_VER > 1200
-int MOONG::NETWORK::Network::Ping(const CStringA IP) const
-#else
 int MOONG::NETWORK::Network::Ping(const std::string IP) const
-#endif
 {
-#if _MSC_VER > 1200
-	CStringA command = "ping -n 1 " + IP;
-#else
 	std::string command = "ping -n 1 " + IP;
-#endif
 
 	std::string strResult;
 
 	int return_value = 0;
 	
-#if _MSC_VER > 1200
-	return_value = ExecCommand(command.GetString(), strResult);
-	if(return_value != EXIT_SUCCESS)
-	{
-		return return_value;
-	}
-#else
 	return_value = ExecCommand(command, strResult);
 	if(return_value != EXIT_SUCCESS)
 	{
 		return return_value;
 	}
-#endif
 
 	// Case 0 (성공)
 	// Ping 172.20.25.130 32바이트 데이터 사용:
@@ -94,17 +66,9 @@ int MOONG::NETWORK::Network::Ping(const std::string IP) const
 	// 172.20.25.130에 대한 Ping 통계:
 	//     패킷: 보냄 = 1, 받음 = 0, 손실 = 1 (100% 손실),
 
-#if _MSC_VER > 1200
-	CStringA response_msg = IP + "의 응답: 바이트=";
-#else
 	std::string response_msg = IP + "의 응답: 바이트=";
-#endif
 
-#if _MSC_VER > 1200
-	if (strstr(strResult.c_str(), response_msg.GetString()))
-#else
-	if (strstr(strResult.c_str(), response_msg.c_str()))
-#endif
+	if (strResult.find(response_msg) != std::string::npos)
 	{
 		return MOONG::NETWORK::RETURN::SUCCESS;
 	}

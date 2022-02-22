@@ -9,10 +9,6 @@
 
 #include <iostream>
 
-#if _MSC_VER > 1200
-#include <atlstr.h>
-#endif
-
 namespace MOONG
 {
 	namespace NETWORK
@@ -32,16 +28,6 @@ namespace MOONG
 		class Network
 		{
 		public:
-#if _MSC_VER > 1200
-			BOOL InternetConnected() const;
-			BOOL InternetConnected(const CStringA param_url) const;
-			// return
-			// RETURN::SUCCESS
-			// RETURN::FAILURE::CREATE_PIPE
-			// RETURN::FAILURE::CREATE_PROCESS
-			// RETURN::FAILURE::PING
-			int Ping(const CStringA IP) const;
-#else
 			bool InternetConnected() const;
 			bool InternetConnected(const std::string param_url) const;
 			// return
@@ -50,7 +36,7 @@ namespace MOONG
 			// RETURN::FAILURE::CREATE_PROCESS
 			// RETURN::FAILURE::PING
 			int Ping(const std::string IP) const;
-#endif
+
 		protected:
 		private:
 			int ExecCommand(const std::string command, std::string& output) const;
