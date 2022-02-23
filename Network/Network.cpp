@@ -1,6 +1,5 @@
 #include "Network.h"
 
-#include <windows.h>
 #include <WinInet.h>
 #pragma comment (lib, "WinInet.lib")
 
@@ -8,7 +7,7 @@
 
 #include <stdexcept>
 
-bool MOONG::NETWORK::Network::InternetConnected() const
+BOOL MOONG::NETWORK::Network::InternetConnected() const
 {
 	DWORD dwFlag = 0;
 	TCHAR szName[256] = { 0 };
@@ -20,7 +19,7 @@ bool MOONG::NETWORK::Network::InternetConnected() const
 #endif
 }
 
-bool MOONG::NETWORK::Network::InternetConnected(const std::string param_url) const
+BOOL MOONG::NETWORK::Network::InternetConnected(const std::string param_url) const
 {
 	return InternetCheckConnectionA(param_url.c_str(), FLAG_ICC_FORCE_CONNECTION, NULL) ? true : false;
 }

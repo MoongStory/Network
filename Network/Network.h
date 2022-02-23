@@ -8,6 +8,7 @@
 #define _NETWORK_H_
 
 #include <iostream>
+#include <windows.h>
 
 namespace MOONG
 {
@@ -28,8 +29,8 @@ namespace MOONG
 		class Network
 		{
 		public:
-			bool InternetConnected() const;
-			bool InternetConnected(const std::string param_url) const;
+			BOOL InternetConnected() const;
+			BOOL InternetConnected(const std::string param_url) const;
 			// return
 			// RETURN::SUCCESS
 			// RETURN::FAILURE::CREATE_PIPE
