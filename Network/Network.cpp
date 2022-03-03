@@ -3,9 +3,8 @@
 #include <WinInet.h>
 #pragma comment (lib, "WinInet.lib")
 
-#include <stdlib.h>
-
-#include <stdexcept>
+#include <Winsock.h>
+#pragma comment (lib, "Ws2_32.lib")
 
 BOOL MOONG::NETWORK::Network::InternetConnected() const
 {
@@ -24,131 +23,165 @@ BOOL MOONG::NETWORK::Network::InternetConnected(const std::string param_url) con
 	return InternetCheckConnectionA(param_url.c_str(), FLAG_ICC_FORCE_CONNECTION, NULL) ? true : false;
 }
 
-int MOONG::NETWORK::Network::Ping(const std::string IP) const
+int MOONG::NETWORK::Network::Ping(const std::string IP, const unsigned int port/* = 80*/, const unsigned int param_timeout/* = 1*/)
 {
-	std::string command = "ping -n 1 " + IP;
+    WSADATA wsaData;
+    int err = 0;
 
-	std::string strResult;
-
-	int return_value = 0;
-	
-	return_value = ExecCommand(command, strResult);
-	if(return_value != EXIT_SUCCESS)
+    err = WSAStartup(MAKEWORD(2, 2), &wsaData);
+	if (err != 0)
 	{
-		return return_value;
+        /* Tell the user that we could not find a usable */
+        /* Winsock DLL.                                  */
+        //printf("WSAStartup failed with error: %d\n", err);
+
+		return MOONG::NETWORK::RETURN::FAILURE::WSASTARTUP_FAILED;
 	}
 
-	// Case 0 (성공)
-	// Ping 172.20.25.130 32바이트 데이터 사용:
-	// 172.20.25.130의 응답: 바이트=32 시간<1ms TTL=63
+	/* Confirm that the WinSock DLL supports 2.2.*/
+	/* Note that if the DLL supports versions greater    */
+	/* than 2.2 in addition to 2.2, it will still return */
+	/* 2.2 in wVersion since that is the version we      */
+	/* requested.                                        */
 
-	// 172.20.25.130에 대한 Ping 통계:
-	//     패킷: 보냄 = 1, 받음 = 1, 손실 = 0 (0% 손실),
-	// 왕복 시간(밀리초):
-	//     최소 = 0ms, 최대 = 0ms, 평균 = 0ms
+	if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2) {
+		/* Tell the user that we could not find a usable */
+		/* WinSock DLL.                                  */
+		//printf("Could not find a usable version of Winsock.dll\n");
 
+		WSACleanup();
 
-
-	// Case 1 (실패)
-	// Ping 172.20.25.130 32바이트 데이터 사용:
-	// 172.20.25.30의 응답: 대상 호스트에 연결할 수 없습니다.
-
-	// 172.20.25.130에 대한 Ping 통계:
-	//     패킷: 보냄 = 1, 받음 = 1, 손실 = 0 (0% 손실),
-
-
-
-	// Case 2 (실패)
-	// Ping 172.20.25.130 32바이트 데이터 사용:
-	// PING: 전송하지 못했습니다. 일반 오류입니다.
-
-	// 172.20.25.130에 대한 Ping 통계:
-	//     패킷: 보냄 = 1, 받음 = 0, 손실 = 1 (100% 손실),
-
-	std::string response_msg = IP + "의 응답: 바이트=";
-
-	if (strResult.find(response_msg) != std::string::npos)
+		return MOONG::NETWORK::RETURN::FAILURE::COULD_NOT_FIND_A_USABLE_VERSION_OF_WINSOCK_DLL;
+	}
+	else
 	{
+		//printf("The Winsock 2.2 dll was found okay\n");
+	}
+
+	/* The Winsock DLL is acceptable. Proceed to use it. */
+	/* Add network programming using Winsock here */
+	SOCKET sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+
+	unsigned int addr = inet_addr(IP.c_str());
+
+	if (addr == INADDR_NONE)
+	{
+		return MOONG::NETWORK::RETURN::FAILURE::INVALID_IP_FORM;
+	}
+
+	struct sockaddr_in address;
+	address.sin_addr.s_addr = addr;
+	address.sin_port = htons(port);
+	address.sin_family = AF_INET;
+
+	// set the socket in non-blocking
+	unsigned long iMode = 1;
+	int return_value = ioctlsocket(sock, FIONBIO, &iMode);
+	if (return_value != NO_ERROR)
+	{
+		//printf("ioctlsocket set non-block failed with error[%d]\n", return_value);
+	}
+
+	if(connect(sock, (struct sockaddr *)&address, sizeof(address)) == false)
+	{
+		return MOONG::NETWORK::RETURN::FAILURE::SOCKET_CONNECT;
+	}
+
+	// set the socket in blocking
+	iMode = 0;
+	return_value = ioctlsocket(sock, FIONBIO, &iMode);
+	if (return_value != NO_ERROR)
+	{
+		//printf("ioctlsocket set block failed with error[%d]\n", return_value);
+	}
+
+	fd_set Write, Err;
+	FD_ZERO(&Write);
+	FD_ZERO(&Err);
+	FD_SET(sock, &Write);
+	FD_SET(sock, &Err);
+	
+	TIMEVAL timeout;
+	timeout.tv_sec = param_timeout;
+	timeout.tv_usec = 0;
+
+	// check if the socket is ready
+	select(0, NULL, &Write, &Err, &timeout);
+	if(FD_ISSET(sock, &Write))
+	{
+		/* then call WSACleanup when done using the Winsock dll */
+		WSACleanup();
+
 		return MOONG::NETWORK::RETURN::SUCCESS;
 	}
 	else
 	{
-		return MOONG::NETWORK::RETURN::FAILURE::PING;
+		/* then call WSACleanup when done using the Winsock dll */
+		WSACleanup();
+
+		return MOONG::NETWORK::RETURN::FAILURE::PING; // 통신 실패.
 	}
 }
 
-int MOONG::NETWORK::Network::ExecCommand(const std::string command, std::string& output) const
+int MOONG::NETWORK::Network::getHostByName(const std::string host_name, struct hostent **remote_host)
 {
-	HANDLE hPipeRead, hPipeWrite;
+	WSADATA wsaData;
+	int iResult = 0;
 
-	SECURITY_ATTRIBUTES saAttr = { sizeof(SECURITY_ATTRIBUTES) };
-	saAttr.bInheritHandle = TRUE; // Pipe handles are inherited by child process.
-	saAttr.lpSecurityDescriptor = NULL;
+	DWORD dwError = 0;
 
-	// Create a pipe to get results from child's stdout.
-	if (!CreatePipe(&hPipeRead, &hPipeWrite, &saAttr, 0))
+	// Initialize Winsock
+	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
+	if (iResult != 0)
 	{
-		return MOONG::NETWORK::RETURN::FAILURE::CREATE_PIPE;
+		//printf("WSAStartup failed[d]\n", iResult);
+		return MOONG::NETWORK::RETURN::FAILURE::WSASTARTUP_FAILED;
 	}
 
-	STARTUPINFOA si = { sizeof(STARTUPINFOA) };
-	si.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
-	si.hStdOutput = hPipeWrite;
-	si.hStdError = hPipeWrite;
-	si.wShowWindow = SW_HIDE; // Prevents cmd window from flashing.
-	// Requires STARTF_USESHOWWINDOW in dwFlags.
-
-	PROCESS_INFORMATION pi = { 0 };
-
-	BOOL fSuccess = CreateProcessA(NULL, (char*)(command.c_str()), NULL, NULL, TRUE, CREATE_NEW_CONSOLE, NULL, NULL, &si, &pi);
-
-	if (!fSuccess)
+	std::string host_name_for_func = host_name;
+	//printf("host_name_for_func before[%s]\n", host_name_for_func.c_str());
+	size_t position = host_name_for_func.find("://");
+	if(position != std::string::npos)
 	{
-		CloseHandle(hPipeWrite);
-		CloseHandle(hPipeRead);
-
-		return MOONG::NETWORK::RETURN::FAILURE::CREATE_PROCESS;
+		host_name_for_func = host_name_for_func.substr(position + strlen("://"));
 	}
 
-	bool bProcessEnded = false;
-	for (; !bProcessEnded;)
+	position = host_name_for_func.find(":");
+	if(position != std::string::npos)
 	{
-		// Give some timeslice (50 ms), so we won't waste 100% CPU.
-		bProcessEnded = WaitForSingleObject(pi.hProcess, 50) == WAIT_OBJECT_0;
+		host_name_for_func = host_name_for_func.substr(0, position);
+	}
 
-		// Even if process exited - we continue reading, if
-		// there is some data available over pipe.
-		for (;;)
+	position = host_name_for_func.find("/");
+	if(position != std::string::npos)
+	{
+		host_name_for_func = host_name_for_func.substr(0, position);
+	}
+	//printf("host_name_for_func after[%s]\n", host_name_for_func.c_str());
+
+	*remote_host = gethostbyname(host_name_for_func.c_str());
+
+	if (*remote_host == NULL)
+	{
+		dwError = WSAGetLastError();
+
+		if (dwError != 0)
 		{
-			char buf[1024] = { 0 };
-			DWORD dwRead = 0;
-			DWORD dwAvail = 0;
-
-			if (!::PeekNamedPipe(hPipeRead, NULL, 0, NULL, &dwAvail, NULL))
+			if (dwError == WSAHOST_NOT_FOUND)
 			{
-				break;
+				return WSAHOST_NOT_FOUND;
 			}
-
-			if (!dwAvail) // No data available, return
+			else if (dwError == WSANO_DATA)
 			{
-				break;
+				return WSANO_DATA;
 			}
-
-			if (!::ReadFile(hPipeRead, buf, min(sizeof(buf) - 1, dwAvail), &dwRead, NULL) || !dwRead)
+			else
 			{
-				// Error, the child process might ended
-				break;
+				printf("Function failed with error[%ld]\n", dwError);
+				return dwError;
 			}
-
-			buf[dwRead] = 0;
-			output += buf;
 		}
 	}
 
-	CloseHandle(hPipeWrite);
-	CloseHandle(hPipeRead);
-	CloseHandle(pi.hProcess);
-	CloseHandle(pi.hThread);
-
-	return EXIT_SUCCESS;
+	return MOONG::NETWORK::RETURN::SUCCESS;
 }

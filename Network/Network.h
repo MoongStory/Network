@@ -20,9 +20,12 @@ namespace MOONG
 
 			namespace FAILURE
 			{
-				const int CREATE_PIPE = 1;
-				const int CREATE_PROCESS = 2;
-				const int PING = 3;
+				const int PING = 1;
+				const int WSASTARTUP_FAILED = 2;
+				const int COULD_NOT_FIND_A_USABLE_VERSION_OF_WINSOCK_DLL = 3;
+				const int INVALID_IP_FORM = 4;
+				const int SOCKET_CONNECT = 5;
+				const int GET_HOST_BY_NAME = 6;
 			}
 		}
 
@@ -31,16 +34,30 @@ namespace MOONG
 		public:
 			BOOL InternetConnected() const;
 			BOOL InternetConnected(const std::string param_url) const;
+
 			// return
-			// RETURN::SUCCESS
-			// RETURN::FAILURE::CREATE_PIPE
-			// RETURN::FAILURE::CREATE_PROCESS
-			// RETURN::FAILURE::PING
-			int Ping(const std::string IP) const;
+			//		MOONG::NETWORK::RETURN::SUCCESS
+			//		MOONG::NETWORK::RETURN::FAILURE::PING
+			//		MOONG::NETWORK::RETURN::FAILURE::WSASTARTUP_FAILED
+			//		MOONG::NETWORK::RETURN::FAILURE::COULD_NOT_FIND_A_USABLE_VERSION_OF_WINSOCK_DLL
+			//		MOONG::NETWORK::RETURN::FAILURE::INVALID_IP_FORM
+			//		MOONG::NETWORK::RETURN::FAILURE::SOCKET_CONNECT
+			int Ping(const std::string IP, const unsigned int port = 80, const unsigned int param_timeout = 1);
+
+			// return
+			//		MOONG::NETWORK::RETURN::FAILURE::WSASTARTUP_FAILED
+			//		WSAHOST_NOT_FOUND
+			//		WSANO_DATA
+			//		WSAGetLastError()
+			// param
+			//		host_name
+			//			URL.
+			//		remote_host
+			//			¹ÝÈ¯.
+			int getHostByName(const std::string host_name, struct hostent **remote_host);
 
 		protected:
 		private:
-			int ExecCommand(const std::string command, std::string& output) const;
 		};
 	}
 }
