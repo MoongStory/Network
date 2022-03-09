@@ -3,9 +3,6 @@
 #include <WinInet.h>
 #pragma comment (lib, "WinInet.lib")
 
-#include <Winsock.h>
-#pragma comment (lib, "Ws2_32.lib")
-
 BOOL MOONG::NETWORK::Network::InternetConnected() const
 {
 	DWORD dwFlag = 0;
@@ -62,6 +59,16 @@ int MOONG::NETWORK::Network::Ping(const std::string IP, const unsigned int port/
 	/* Add network programming using Winsock here */
 	SOCKET sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
+#if _MSC_VER > 1200
+	struct sockaddr_in address;
+
+	inet_pton(AF_INET, IP.c_str(), &address.sin_addr.s_addr);
+
+	if (address.sin_addr.s_addr == INADDR_NONE)
+	{
+		return MOONG::NETWORK::RETURN::FAILURE::INVALID_IP_FORM;
+	}
+#else
 	unsigned int addr = inet_addr(IP.c_str());
 
 	if (addr == INADDR_NONE)
@@ -71,6 +78,7 @@ int MOONG::NETWORK::Network::Ping(const std::string IP, const unsigned int port/
 
 	struct sockaddr_in address;
 	address.sin_addr.s_addr = addr;
+#endif
 	address.sin_port = htons(port);
 	address.sin_family = AF_INET;
 
@@ -123,20 +131,48 @@ int MOONG::NETWORK::Network::Ping(const std::string IP, const unsigned int port/
 	}
 }
 
-int MOONG::NETWORK::Network::getHostByName(const std::string host_name, struct hostent **remote_host)
+int MOONG::NETWORK::Network::getHostByName(const std::string host_name, const std::string port, std::vector<ADDR_INFO> &param_addr_info)
 {
-	WSADATA wsaData;
-	int iResult = 0;
+	// https://docs.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-getaddrinfo
+    //-----------------------------------------
+    // Declare and initialize variables
+	ADDR_INFO addr_info;
 
-	DWORD dwError = 0;
+    WSADATA wsaData = {0};
+    int iResult = 0;
+    INT iRetval = 0;
 
-	// Initialize Winsock
-	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
-	if (iResult != 0)
+    DWORD dwRetval = 0;
+
+    int i = 1;
+    
+    struct addrinfo *result = NULL;
+    struct addrinfo *ptr = NULL;
+    struct addrinfo hints = {0};
+
+    struct sockaddr_in  *sockaddr_ipv4;
+//    struct sockaddr_in6 *sockaddr_ipv6;
+    LPSOCKADDR sockaddr_ip = NULL;
+
+    wchar_t ipstringbuffer[46] = {0};
+    DWORD ipbufferlength = 46;
+
+    // Initialize Winsock
+    iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
+    if (iResult != 0)
 	{
-		//printf("WSAStartup failed[d]\n", iResult);
-		return MOONG::NETWORK::RETURN::FAILURE::WSASTARTUP_FAILED;
-	}
+        printf("WSAStartup failed[%d]\n", iResult);
+
+        return 1;
+    }
+
+    //--------------------------------
+    // Setup the hints address info structure
+    // which is passed to the getaddrinfo() function
+    ZeroMemory( &hints, sizeof(hints) );
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_protocol = IPPROTO_TCP;
 
 	std::string host_name_for_func = host_name;
 	//printf("host_name_for_func before[%s]\n", host_name_for_func.c_str());
@@ -158,30 +194,189 @@ int MOONG::NETWORK::Network::getHostByName(const std::string host_name, struct h
 		host_name_for_func = host_name_for_func.substr(0, position);
 	}
 	//printf("host_name_for_func after[%s]\n", host_name_for_func.c_str());
-
-	*remote_host = gethostbyname(host_name_for_func.c_str());
-
-	if (*remote_host == NULL)
+    
+	//--------------------------------
+	// Call getaddrinfo(). If the call succeeds,
+	// the result variable will hold a linked list
+	// of addrinfo structures containing response
+	// information
+    dwRetval = getaddrinfo(host_name_for_func.c_str(), port.c_str(), &hints, &result);
+    if ( dwRetval != 0 )
 	{
-		dwError = WSAGetLastError();
+        printf("getaddrinfo failed with error[%d]\n", dwRetval);
 
-		if (dwError != 0)
+        WSACleanup();
+
+        return 1;
+    }
+    
+	char IP[64] = {0};
+
+    // Retrieve each address and print out the hex bytes
+    for(ptr = result; ptr != NULL; ptr = ptr->ai_next)
+	{
+		addr_info.Clear();
+		ZeroMemory(IP, sizeof(IP));
+
+		addr_info.setFlags(ptr->ai_flags);
+        switch (ptr->ai_family) {
+            case AF_UNSPEC:
+				addr_info.setFamily("Unspecified");
+                break;
+            case AF_INET:
+				addr_info.setFamily("AF_INET (IPv4)");
+                sockaddr_ipv4 = (struct sockaddr_in *) ptr->ai_addr;
+				// FIXME: inet_ntop
+#if _MSC_VER > 1200
+				inet_ntop(ptr->ai_family, &(sockaddr_ipv4->sin_addr), IP, sizeof(IP));
+				addr_info.setIPAddress(IP);
+#else
+				addr_info.setIPAddress(inet_ntoa(sockaddr_ipv4->sin_addr));
+#endif
+                break;
+            case AF_INET6:
+				addr_info.setFamily("AF_INET6 (IPv6)");
+                // the InetNtop function is available on Windows Vista and later
+                // sockaddr_ipv6 = (struct sockaddr_in6 *) ptr->ai_addr;
+                // printf("\tIPv6 address %s\n",
+                //    InetNtop(AF_INET6, &sockaddr_ipv6->sin6_addr, ipstringbuffer, 46) );
+                
+                // We use WSAAddressToString since it is supported on Windows XP and later
+                sockaddr_ip = (LPSOCKADDR) ptr->ai_addr;
+                // The buffer length is changed by each call to WSAAddresstoString
+                // So we need to set it for each iteration through the loop for safety
+                ipbufferlength = 46;
+                iRetval = WSAAddressToStringW(sockaddr_ip, (DWORD) ptr->ai_addrlen, NULL, ipstringbuffer, &ipbufferlength );
+                if (iRetval)
+				{
+					char str_temp[64] = {0};
+#if _MSC_VER > 1200
+					_itoa_s(WSAGetLastError(), str_temp, sizeof(str_temp), 10);
+#else
+					_itoa(WSAGetLastError(), str_temp, 10);
+#endif
+
+					std::string temp = "WSAAddressToString failed with ";
+					temp += str_temp;
+
+					addr_info.setIPAddress(temp);
+				}
+                else    
+				{
+					if(ipstringbuffer != NULL)
+					{
+						const size_t new_size = (wcslen(ipstringbuffer) + 1) * 2;
+						char* nstring = new char[new_size];
+
+						size_t convertedChars = 0;
+						wcstombs_s(&convertedChars, nstring, new_size, ipstringbuffer, _TRUNCATE);
+
+						addr_info.setIPAddress(nstring);
+
+						delete[] nstring;
+					}
+				}
+                break;
+            case AF_NETBIOS:
+				addr_info.setFamily("AF_NETBIOS (NetBIOS)");
+                break;
+			default:
+				char str_temp[256] = {0};
+#if _MSC_VER > 1200
+				_itoa_s(ptr->ai_family, str_temp, sizeof(str_temp), 10);
+#else
+				_itoa(ptr->ai_family, str_temp, 10);
+#endif
+
+				std::string temp = "Other ";
+				temp += str_temp;
+
+				addr_info.setFamily(temp);
+                break;
+        }
+
+        switch (ptr->ai_socktype) {
+            case 0:
+				addr_info.setSocketType("Unspecified");
+                break;
+            case SOCK_STREAM:
+				addr_info.setSocketType("SOCK_STREAM (stream)");
+                break;
+            case SOCK_DGRAM:
+				addr_info.setSocketType("SOCK_DGRAM (datagram)");
+                break;
+            case SOCK_RAW:
+				addr_info.setSocketType("SOCK_RAW (raw)");
+                break;
+            case SOCK_RDM:
+				addr_info.setSocketType("SOCK_RDM (reliable message datagram)");
+                break;
+            case SOCK_SEQPACKET:
+				addr_info.setSocketType("SOCK_SEQPACKET (pseudo-stream packet)");
+                break;
+            default:
+				char str_temp[256] = {0};
+#if _MSC_VER > 1200
+				_itoa_s(ptr->ai_socktype, str_temp, sizeof(str_temp), 10);
+#else
+				_itoa(ptr->ai_socktype, str_temp, 10);
+#endif
+
+				std::string temp = "Other ";
+				temp += str_temp;
+				
+				addr_info.setSocketType(temp);
+                break;
+        }
+
+        switch (ptr->ai_protocol) {
+            case 0:
+				addr_info.setProtocol("Unspecified");
+                break;
+            case IPPROTO_TCP:
+				addr_info.setProtocol("IPPROTO_TCP (TCP)");
+                break;
+            case IPPROTO_UDP:
+				addr_info.setProtocol("IPPROTO_UDP (UDP)");
+                break;
+            default:
+				char str_temp[256] = {0};
+#if _MSC_VER > 1200
+				_itoa_s(ptr->ai_protocol, str_temp, sizeof(str_temp), 10);
+#else
+				_itoa(ptr->ai_protocol, str_temp, 10);
+#endif
+
+				std::string temp = "Other ";
+				temp += str_temp;
+
+				addr_info.setProtocol(temp);
+                break;
+        }
+		addr_info.setLengthOfThisSockaddr(ptr->ai_addrlen);
+		if(ptr->ai_canonname != NULL)
 		{
-			if (dwError == WSAHOST_NOT_FOUND)
-			{
-				return WSAHOST_NOT_FOUND;
-			}
-			else if (dwError == WSANO_DATA)
-			{
-				return WSANO_DATA;
-			}
-			else
-			{
-				printf("Function failed with error[%ld]\n", dwError);
-				return dwError;
-			}
+			addr_info.setCanonicalName(ptr->ai_canonname);
 		}
-	}
 
-	return MOONG::NETWORK::RETURN::SUCCESS;
+		param_addr_info.push_back(addr_info);
+    }
+
+    freeaddrinfo(result);
+
+    WSACleanup();
+
+    return MOONG::NETWORK::RETURN::SUCCESS;
+}
+
+int MOONG::NETWORK::Network::getHostByName(const std::string host_name, const unsigned int port, std::vector<ADDR_INFO> &param_addr_info)
+{
+	char str_temp[64] = {0};
+#if _MSC_VER > 1200
+	_itoa_s(port, str_temp, sizeof(str_temp), 10);
+#else
+	_itoa(port, str_temp, 10);
+#endif
+
+	return this->getHostByName(host_name, str_temp, param_addr_info);
 }

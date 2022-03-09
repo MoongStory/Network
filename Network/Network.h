@@ -7,7 +7,11 @@
 #ifndef _NETWORK_H_
 #define _NETWORK_H_
 
+#include <ws2tcpip.h>
+#pragma comment (lib, "Ws2_32.lib")
+
 #include <iostream>
+#include <vector>
 #include <windows.h>
 
 namespace MOONG
@@ -29,6 +33,92 @@ namespace MOONG
 			}
 		}
 
+		class ADDR_INFO
+		{
+		public:
+			void Clear()
+			{
+				this->flags_ = 0;
+				this->family_.erase();
+				this->ip_address_.erase();
+				this->socket_type_.erase();
+				this->protocol_.erase();
+				this->length_of_this_sockaddr_ = 0;
+				this->canonical_name_.erase();
+			}
+
+			int getFlags()
+			{
+				return this->flags_;
+			}
+			void setFlags(const int flags)
+			{
+				this->flags_ = flags;
+			}
+
+			std::string getFamily()
+			{
+				return this->family_;
+			}
+			void setFamily(std::string family)
+			{
+				this->family_ = family;
+			}
+
+			std::string getIPAddress()
+			{
+				return this->ip_address_;
+			}
+			void setIPAddress(std::string ip_address)
+			{
+				this->ip_address_ = ip_address;
+			}
+
+			std::string getSocketType()
+			{
+				return this->socket_type_;
+			}
+			void setSocketType(std::string socket_type)
+			{
+				this->socket_type_ = socket_type;
+			}
+
+			std::string getProtocol()
+			{
+				return this->protocol_;
+			}
+			void setProtocol(std::string protocol)
+			{
+				this->protocol_ = protocol;
+			}
+
+			size_t getLengthOfThisSockaddr()
+			{
+				return this->length_of_this_sockaddr_;
+			}
+			void setLengthOfThisSockaddr(const size_t length_of_this_sockaddr)
+			{
+				this->length_of_this_sockaddr_ = length_of_this_sockaddr;
+			}
+
+			std::string getCanonicalName()
+			{
+				return this->canonical_name_;
+			}
+			void setCanonicalName(std::string canonical_name)
+			{
+				this->canonical_name_ = canonical_name;
+			}
+		private:
+			int flags_;
+			std::string family_;
+			std::string ip_address_;
+			std::string socket_type_;
+			std::string protocol_;
+			size_t length_of_this_sockaddr_;
+			std::string canonical_name_;
+		};
+
 		class Network
 		{
 		public:
@@ -45,16 +135,15 @@ namespace MOONG
 			int Ping(const std::string IP, const unsigned int port = 80, const unsigned int param_timeout = 1);
 
 			// return
-			//		MOONG::NETWORK::RETURN::FAILURE::WSASTARTUP_FAILED
-			//		WSAHOST_NOT_FOUND
-			//		WSANO_DATA
-			//		WSAGetLastError()
+			//		MOONG::NETWORK::RETURN::SUCCESS
 			// param
 			//		host_name
 			//			URL.
-			//		remote_host
+			//		port
+			//		param_addr_info
 			//			¹ÝÈ¯.
-			int getHostByName(const std::string host_name, struct hostent **remote_host);
+			int getHostByName(const std::string host_name, const std::string port, std::vector<ADDR_INFO> &param_addr_info);
+			int getHostByName(const std::string host_name, const unsigned int port, std::vector<ADDR_INFO> &param_addr_info);
 
 		protected:
 		private:
