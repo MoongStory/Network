@@ -226,7 +226,6 @@ int MOONG::NETWORK::Network::getHostByName(const std::string host_name, const st
             case AF_INET:
 				addr_info.setFamily("AF_INET (IPv4)");
                 sockaddr_ipv4 = (struct sockaddr_in *) ptr->ai_addr;
-				// FIXME: inet_ntop
 #if _MSC_VER > 1200
 				inet_ntop(ptr->ai_family, &(sockaddr_ipv4->sin_addr), IP, sizeof(IP));
 				addr_info.setIPAddress(IP);
@@ -268,8 +267,12 @@ int MOONG::NETWORK::Network::getHostByName(const std::string host_name, const st
 						const size_t new_size = (wcslen(ipstringbuffer) + 1) * 2;
 						char* nstring = new char[new_size];
 
+#if _MSC_VER > 1200
 						size_t convertedChars = 0;
 						wcstombs_s(&convertedChars, nstring, new_size, ipstringbuffer, _TRUNCATE);
+#else
+						wcstombs(nstring, ipstringbuffer, new_size);
+#endif
 
 						addr_info.setIPAddress(nstring);
 
