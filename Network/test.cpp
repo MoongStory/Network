@@ -13,6 +13,10 @@ int main()
 	const int PORT_0 = 54321;
 	const int PORT_1 = 80;
 
+	std::cout << "Port from URL[" << network.getPortFromURL(URL) << "]" << std::endl;
+
+	std::cout << std::endl;
+
 	if (network.InternetConnected())
 	{
 		std::cout << "InternetConnected()\n\tSUCCESS" << std::endl;
@@ -36,9 +40,9 @@ int main()
 	std::cout << std::endl;
 
 	std::vector<MOONG::NETWORK::ADDR_INFO> addr_info;
-	if (network.getHostByName(URL, PORT_1, addr_info) == MOONG::NETWORK::RETURN::SUCCESS)
+	if (network.getAddrInfoFromURL(URL, PORT_1, addr_info) == MOONG::NETWORK::RETURN::SUCCESS)
 	{
-		std::cout << "URL[" << URL.c_str() << "], PORT[" << PORT_1 << "] Information" << std::endl;
+		std::cout << "URL[" << URL.c_str() << "], PORT[" << PORT.c_str() << "] Information" << std::endl;
 		for(size_t i = 0; i < addr_info.size(); i++)
 		{
 			std::cout << "\tFlags[0x" << std::hex << addr_info[i].getFlags() << "]" << std::endl;
@@ -47,7 +51,7 @@ int main()
 			std::cout << "\tSocket type[" << addr_info[i].getSocketType().c_str() << "]" << std::endl;
 			std::cout << "\tProtocol[" << addr_info[i].getProtocol().c_str() << "]" << std::endl;
 			std::cout << "\tLength of this sockaddr[" << std::dec << addr_info[i].getLengthOfThisSockaddr() << "]" << std::endl;
-			std::cout << "\tCanonical name[" << std::dec << addr_info[i].getCanonicalName().c_str() << "]" << std::endl;
+			std::cout << "\tCanonical name[" << addr_info[i].getCanonicalName().c_str() << "]" << std::endl;
 
 			std::cout << std::endl;
 

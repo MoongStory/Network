@@ -142,8 +142,15 @@ namespace MOONG
 			//		port
 			//		param_addr_info
 			//			반환.
-			int getHostByName(const std::string host_name, const std::string port, std::vector<ADDR_INFO> &param_addr_info);
-			int getHostByName(const std::string host_name, const unsigned int port, std::vector<ADDR_INFO> &param_addr_info);
+			int getAddrInfoFromURL(const std::string url, const std::string port, std::vector<ADDR_INFO> &param_addr_info);
+			int getAddrInfoFromURL(const std::string url, const unsigned int port, std::vector<ADDR_INFO> &param_addr_info);
+
+			// return
+			//		포트 번호.
+			//		-1 : URL에 포트가 포함되어 있지 않은 경우.
+			// param
+			//		url
+			int getPortFromURL(const std::string url);
 
 		protected:
 		private:

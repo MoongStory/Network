@@ -131,7 +131,7 @@ int MOONG::NETWORK::Network::Ping(const std::string IP, const unsigned int port/
 	}
 }
 
-int MOONG::NETWORK::Network::getHostByName(const std::string host_name, const std::string port, std::vector<ADDR_INFO> &param_addr_info)
+int MOONG::NETWORK::Network::getAddrInfoFromURL(const std::string url, const std::string port, std::vector<ADDR_INFO> &param_addr_info)
 {
 	// https://docs.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-getaddrinfo
     //-----------------------------------------
@@ -174,33 +174,33 @@ int MOONG::NETWORK::Network::getHostByName(const std::string host_name, const st
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_protocol = IPPROTO_TCP;
 
-	std::string host_name_for_func = host_name;
-	//printf("host_name_for_func before[%s]\n", host_name_for_func.c_str());
-	size_t position = host_name_for_func.find("://");
+	std::string url_for_func = url;
+	//printf("url_for_func before[%s]\n", url_for_func.c_str());
+	size_t position = url_for_func.find("://");
 	if(position != std::string::npos)
 	{
-		host_name_for_func = host_name_for_func.substr(position + strlen("://"));
+		url_for_func = url_for_func.substr(position + strlen("://"));
 	}
 
-	position = host_name_for_func.find(":");
+	position = url_for_func.find(":");
 	if(position != std::string::npos)
 	{
-		host_name_for_func = host_name_for_func.substr(0, position);
+		url_for_func = url_for_func.substr(0, position);
 	}
 
-	position = host_name_for_func.find("/");
+	position = url_for_func.find("/");
 	if(position != std::string::npos)
 	{
-		host_name_for_func = host_name_for_func.substr(0, position);
+		url_for_func = url_for_func.substr(0, position);
 	}
-	//printf("host_name_for_func after[%s]\n", host_name_for_func.c_str());
+	//printf("url_for_func after[%s]\n", url_for_func.c_str());
     
 	//--------------------------------
 	// Call getaddrinfo(). If the call succeeds,
 	// the result variable will hold a linked list
 	// of addrinfo structures containing response
 	// information
-    dwRetval = getaddrinfo(host_name_for_func.c_str(), port.c_str(), &hints, &result);
+    dwRetval = getaddrinfo(url_for_func.c_str(), port.c_str(), &hints, &result);
     if ( dwRetval != 0 )
 	{
         printf("getaddrinfo failed with error[%d]\n", dwRetval);
@@ -372,7 +372,7 @@ int MOONG::NETWORK::Network::getHostByName(const std::string host_name, const st
     return MOONG::NETWORK::RETURN::SUCCESS;
 }
 
-int MOONG::NETWORK::Network::getHostByName(const std::string host_name, const unsigned int port, std::vector<ADDR_INFO> &param_addr_info)
+int MOONG::NETWORK::Network::getAddrInfoFromURL(const std::string url, const unsigned int port, std::vector<ADDR_INFO> &param_addr_info)
 {
 	char str_temp[64] = {0};
 #if _MSC_VER > 1200
@@ -381,5 +381,34 @@ int MOONG::NETWORK::Network::getHostByName(const std::string host_name, const un
 	_itoa(port, str_temp, 10);
 #endif
 
-	return this->getHostByName(host_name, str_temp, param_addr_info);
+	return this->getAddrInfoFromURL(url, str_temp, param_addr_info);
+}
+
+int MOONG::NETWORK::Network::getPortFromURL(const std::string url)
+{
+	std::string port = url;
+
+	size_t position = port.find("://");
+	if(position != std::string::npos)
+	{
+		port = port.substr(position + strlen("://"));
+	}
+
+	position = port.find("/");
+	if(position != std::string::npos)
+	{
+		port = port.substr(0, position);
+	}
+
+	position = port.find(":");
+	if(position != std::string::npos)
+	{
+		port = port.substr(position + 1);
+	}
+	else
+	{
+		port = "-1";
+	}
+
+	return atoi(port.c_str());
 }
