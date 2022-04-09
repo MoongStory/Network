@@ -20,7 +20,7 @@ BOOL MOONG::NETWORK::Network::InternetConnected(const std::string param_url) con
 	return InternetCheckConnectionA(param_url.c_str(), FLAG_ICC_FORCE_CONNECTION, NULL) ? true : false;
 }
 
-int MOONG::NETWORK::Network::Ping(const std::string address, const unsigned int port/* = 80*/, const unsigned int param_timeout/* = 1*/)
+int MOONG::NETWORK::Network::Ping(const std::string address, const unsigned int port/* = 80*/, const unsigned int param_timeout/* = 1*/) const
 {
     WSADATA wsaData;
     int err = 0;
@@ -135,7 +135,7 @@ int MOONG::NETWORK::Network::Ping(const std::string address, const unsigned int 
 	}
 }
 
-int MOONG::NETWORK::Network::getAddrInfoFromURL(const std::string url, const std::string port, std::vector<ADDR_INFO> &param_addr_info)
+int MOONG::NETWORK::Network::getAddrInfoFromURL(const std::string url, const std::string port, std::vector<ADDR_INFO> &param_addr_info) const
 {
 	// https://docs.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-getaddrinfo
     //-----------------------------------------
@@ -376,7 +376,7 @@ int MOONG::NETWORK::Network::getAddrInfoFromURL(const std::string url, const std
     return MOONG::NETWORK::RETURN::SUCCESS;
 }
 
-int MOONG::NETWORK::Network::getAddrInfoFromURL(const std::string url, const unsigned int port, std::vector<ADDR_INFO> &param_addr_info)
+int MOONG::NETWORK::Network::getAddrInfoFromURL(const std::string url, const unsigned int port, std::vector<ADDR_INFO> &param_addr_info) const
 {
 	char str_temp[64] = {0};
 #if _MSC_VER > 1200
@@ -388,7 +388,7 @@ int MOONG::NETWORK::Network::getAddrInfoFromURL(const std::string url, const uns
 	return this->getAddrInfoFromURL(url, str_temp, param_addr_info);
 }
 
-int MOONG::NETWORK::Network::getPortFromURL(const std::string url)
+int MOONG::NETWORK::Network::getPortFromURL(const std::string url) const
 {
 	std::string port = url;
 

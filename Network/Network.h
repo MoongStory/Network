@@ -144,7 +144,7 @@ namespace MOONG
 			//		MOONG::NETWORK::RETURN::FAILURE::COULD_NOT_FIND_A_USABLE_VERSION_OF_WINSOCK_DLL
 			//		MOONG::NETWORK::RETURN::FAILURE::INVALID_IP_FORM
 			//		MOONG::NETWORK::RETURN::FAILURE::SOCKET_CONNECT
-			int Ping(const std::string address, const unsigned int port = 80, const unsigned int param_timeout = 1);
+			int Ping(const std::string address, const unsigned int port = 80, const unsigned int param_timeout = 1) const;
 
 			// return
 			//		MOONG::NETWORK::RETURN::SUCCESS
@@ -154,15 +154,15 @@ namespace MOONG
 			//		port
 			//		param_addr_info
 			//			반환.
-			int getAddrInfoFromURL(const std::string url, const std::string port, std::vector<ADDR_INFO> &param_addr_info);
-			int getAddrInfoFromURL(const std::string url, const unsigned int port, std::vector<ADDR_INFO> &param_addr_info);
+			int getAddrInfoFromURL(const std::string url, const std::string port, std::vector<ADDR_INFO> &param_addr_info) const;
+			int getAddrInfoFromURL(const std::string url, const unsigned int port, std::vector<ADDR_INFO> &param_addr_info) const;
 
 			// return
 			//		포트 번호.
 			//		-1 : URL에 포트가 포함되어 있지 않은 경우.
 			// param
 			//		url
-			int getPortFromURL(const std::string url);
+			int getPortFromURL(const std::string url) const;
 
 		protected:
 		private:
