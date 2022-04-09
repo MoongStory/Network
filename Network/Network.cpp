@@ -20,7 +20,7 @@ BOOL MOONG::NETWORK::Network::InternetConnected(const std::string param_url) con
 	return InternetCheckConnectionA(param_url.c_str(), FLAG_ICC_FORCE_CONNECTION, NULL) ? true : false;
 }
 
-int MOONG::NETWORK::Network::Ping(const std::string IP, const unsigned int port/* = 80*/, const unsigned int param_timeout/* = 1*/)
+int MOONG::NETWORK::Network::Ping(const std::string address, const unsigned int port/* = 80*/, const unsigned int param_timeout/* = 1*/)
 {
     WSADATA wsaData;
     int err = 0;
@@ -58,29 +58,33 @@ int MOONG::NETWORK::Network::Ping(const std::string IP, const unsigned int port/
 	/* The Winsock DLL is acceptable. Proceed to use it. */
 	/* Add network programming using Winsock here */
 	SOCKET sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	if (sock == INVALID_SOCKET)
+	{
+		return MOONG::NETWORK::RETURN::FAILURE::SOCKET_FUNCTION_CALL;
+	}
 
 #if _MSC_VER > 1200
-	struct sockaddr_in address;
+	struct sockaddr_in socket_address;
 
-	inet_pton(AF_INET, IP.c_str(), &address.sin_addr.s_addr);
+	inet_pton(AF_INET, address.c_str(), &socket_address.sin_addr.s_addr);
 
-	if (address.sin_addr.s_addr == INADDR_NONE)
+	if (socket_address.sin_addr.s_addr == INADDR_NONE)
 	{
 		return MOONG::NETWORK::RETURN::FAILURE::INVALID_IP_FORM;
 	}
 #else
-	unsigned int addr = inet_addr(IP.c_str());
+	unsigned int addr = inet_addr(address.c_str());
 
 	if (addr == INADDR_NONE)
 	{
 		return MOONG::NETWORK::RETURN::FAILURE::INVALID_IP_FORM;
 	}
 
-	struct sockaddr_in address;
-	address.sin_addr.s_addr = addr;
+	struct sockaddr_in socket_address;
+	socket_address.sin_addr.s_addr = addr;
 #endif
-	address.sin_port = htons(port);
-	address.sin_family = AF_INET;
+	socket_address.sin_port = htons(port);
+	socket_address.sin_family = AF_INET;
 
 	// set the socket in non-blocking
 	unsigned long iMode = 1;
@@ -90,7 +94,7 @@ int MOONG::NETWORK::Network::Ping(const std::string IP, const unsigned int port/
 		//printf("ioctlsocket set non-block failed with error[%d]\n", return_value);
 	}
 
-	if(connect(sock, (struct sockaddr *)&address, sizeof(address)) == false)
+	if(connect(sock, (struct sockaddr *)&socket_address, sizeof(socket_address)) == false)
 	{
 		return MOONG::NETWORK::RETURN::FAILURE::SOCKET_CONNECT;
 	}

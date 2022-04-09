@@ -30,12 +30,24 @@ namespace MOONG
 				const int INVALID_IP_FORM = 4;
 				const int SOCKET_CONNECT = 5;
 				const int GET_HOST_BY_NAME = 6;
+				const int SOCKET_FUNCTION_CALL = 7;
 			}
 		}
 
 		class ADDR_INFO
 		{
 		public:
+			ADDR_INFO()
+			{
+				this->flags_ = 0;
+				this->family_.erase();
+				this->ip_address_.erase();
+				this->socket_type_.erase();
+				this->protocol_.erase();
+				this->length_of_this_sockaddr_ = 0;
+				this->canonical_name_.erase();
+			}
+
 			void Clear()
 			{
 				this->flags_ = 0;
@@ -132,7 +144,7 @@ namespace MOONG
 			//		MOONG::NETWORK::RETURN::FAILURE::COULD_NOT_FIND_A_USABLE_VERSION_OF_WINSOCK_DLL
 			//		MOONG::NETWORK::RETURN::FAILURE::INVALID_IP_FORM
 			//		MOONG::NETWORK::RETURN::FAILURE::SOCKET_CONNECT
-			int Ping(const std::string IP, const unsigned int port = 80, const unsigned int param_timeout = 1);
+			int Ping(const std::string address, const unsigned int port = 80, const unsigned int param_timeout = 1);
 
 			// return
 			//		MOONG::NETWORK::RETURN::SUCCESS
