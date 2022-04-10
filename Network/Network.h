@@ -137,14 +137,7 @@ namespace MOONG
 			BOOL InternetConnected() const;
 			BOOL InternetConnected(const std::string param_url) const;
 
-			// return
-			//		MOONG::NETWORK::RETURN::SUCCESS
-			//		MOONG::NETWORK::RETURN::FAILURE::PING
-			//		MOONG::NETWORK::RETURN::FAILURE::WSASTARTUP_FAILED
-			//		MOONG::NETWORK::RETURN::FAILURE::COULD_NOT_FIND_A_USABLE_VERSION_OF_WINSOCK_DLL
-			//		MOONG::NETWORK::RETURN::FAILURE::INVALID_IP_FORM
-			//		MOONG::NETWORK::RETURN::FAILURE::SOCKET_CONNECT
-			int Ping(const std::string address, const unsigned int port = 80, const unsigned int param_timeout = 1) const;
+			BOOL Ping(const std::string address, const unsigned int port = 80, const unsigned int timeout = 1) const;
 
 			// return
 			//		MOONG::NETWORK::RETURN::SUCCESS
@@ -166,6 +159,17 @@ namespace MOONG
 
 		protected:
 		private:
+			BOOL Is_IPv4_Format_(const std::string IP) const;
+
+			// return
+			//		MOONG::NETWORK::RETURN::SUCCESS
+			//		MOONG::NETWORK::RETURN::FAILURE::PING
+			//		MOONG::NETWORK::RETURN::FAILURE::WSASTARTUP_FAILED
+			//		MOONG::NETWORK::RETURN::FAILURE::COULD_NOT_FIND_A_USABLE_VERSION_OF_WINSOCK_DLL
+			//		MOONG::NETWORK::RETURN::FAILURE::INVALID_IP_FORM
+			//		MOONG::NETWORK::RETURN::FAILURE::SOCKET_CONNECT
+			//		MOONG::NETWORK::RETURN::FAILURE::SOCKET_FUNCTION_CALL
+			int Ping_(const std::string IP, const unsigned int port = 80, const unsigned int param_timeout = 1) const;
 		};
 	}
 }

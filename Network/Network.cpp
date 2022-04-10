@@ -3,6 +3,8 @@
 #include <WinInet.h>
 #pragma comment (lib, "WinInet.lib")
 
+#include <sstream>
+
 BOOL MOONG::NETWORK::Network::InternetConnected() const
 {
 	DWORD dwFlag = 0;
@@ -20,119 +22,35 @@ BOOL MOONG::NETWORK::Network::InternetConnected(const std::string param_url) con
 	return InternetCheckConnectionA(param_url.c_str(), FLAG_ICC_FORCE_CONNECTION, NULL) ? true : false;
 }
 
-int MOONG::NETWORK::Network::Ping(const std::string address, const unsigned int port/* = 80*/, const unsigned int param_timeout/* = 1*/) const
+BOOL MOONG::NETWORK::Network::Ping(const std::string address, const unsigned int port/* = 80*/, const unsigned int timeout/* = 1*/) const
 {
-    WSADATA wsaData;
-    int err = 0;
-
-    err = WSAStartup(MAKEWORD(2, 2), &wsaData);
-	if (err != 0)
+	if (this->Is_IPv4_Format_(address))
 	{
-        /* Tell the user that we could not find a usable */
-        /* Winsock DLL.                                  */
-        //printf("WSAStartup failed with error: %d\n", err);
-
-		return MOONG::NETWORK::RETURN::FAILURE::WSASTARTUP_FAILED;
-	}
-
-	/* Confirm that the WinSock DLL supports 2.2.*/
-	/* Note that if the DLL supports versions greater    */
-	/* than 2.2 in addition to 2.2, it will still return */
-	/* 2.2 in wVersion since that is the version we      */
-	/* requested.                                        */
-
-	if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2) {
-		/* Tell the user that we could not find a usable */
-		/* WinSock DLL.                                  */
-		//printf("Could not find a usable version of Winsock.dll\n");
-
-		WSACleanup();
-
-		return MOONG::NETWORK::RETURN::FAILURE::COULD_NOT_FIND_A_USABLE_VERSION_OF_WINSOCK_DLL;
+		if (this->Ping_(address, port, timeout) == MOONG::NETWORK::RETURN::SUCCESS)
+		{
+			return TRUE;
+		}
+		else
+		{
+			return FALSE;
+		}
 	}
 	else
 	{
-		//printf("The Winsock 2.2 dll was found okay\n");
+		std::vector<MOONG::NETWORK::ADDR_INFO> addr_info;
+		if (this->getAddrInfoFromURL(address, port, addr_info) == MOONG::NETWORK::RETURN::SUCCESS)
+		{
+			for (size_t i = 0; i < addr_info.size(); i++)
+			{
+				if (this->Ping_(addr_info[i].getIPAddress(), port, timeout) == MOONG::NETWORK::RETURN::SUCCESS)
+				{
+					return TRUE;
+				}
+			}
+		}
 	}
 
-	/* The Winsock DLL is acceptable. Proceed to use it. */
-	/* Add network programming using Winsock here */
-	SOCKET sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-	if (sock == INVALID_SOCKET)
-	{
-		return MOONG::NETWORK::RETURN::FAILURE::SOCKET_FUNCTION_CALL;
-	}
-
-#if _MSC_VER > 1200
-	struct sockaddr_in socket_address;
-
-	inet_pton(AF_INET, address.c_str(), &socket_address.sin_addr.s_addr);
-
-	if (socket_address.sin_addr.s_addr == INADDR_NONE)
-	{
-		return MOONG::NETWORK::RETURN::FAILURE::INVALID_IP_FORM;
-	}
-#else
-	unsigned int addr = inet_addr(address.c_str());
-
-	if (addr == INADDR_NONE)
-	{
-		return MOONG::NETWORK::RETURN::FAILURE::INVALID_IP_FORM;
-	}
-
-	struct sockaddr_in socket_address;
-	socket_address.sin_addr.s_addr = addr;
-#endif
-	socket_address.sin_port = htons(port);
-	socket_address.sin_family = AF_INET;
-
-	// set the socket in non-blocking
-	unsigned long iMode = 1;
-	int return_value = ioctlsocket(sock, FIONBIO, &iMode);
-	if (return_value != NO_ERROR)
-	{
-		//printf("ioctlsocket set non-block failed with error[%d]\n", return_value);
-	}
-
-	if(connect(sock, (struct sockaddr *)&socket_address, sizeof(socket_address)) == false)
-	{
-		return MOONG::NETWORK::RETURN::FAILURE::SOCKET_CONNECT;
-	}
-
-	// set the socket in blocking
-	iMode = 0;
-	return_value = ioctlsocket(sock, FIONBIO, &iMode);
-	if (return_value != NO_ERROR)
-	{
-		//printf("ioctlsocket set block failed with error[%d]\n", return_value);
-	}
-
-	fd_set Write, Err;
-	FD_ZERO(&Write);
-	FD_ZERO(&Err);
-	FD_SET(sock, &Write);
-	FD_SET(sock, &Err);
-	
-	TIMEVAL timeout;
-	timeout.tv_sec = param_timeout;
-	timeout.tv_usec = 0;
-
-	// check if the socket is ready
-	select(0, NULL, &Write, &Err, &timeout);
-	if(FD_ISSET(sock, &Write))
-	{
-		/* then call WSACleanup when done using the Winsock dll */
-		WSACleanup();
-
-		return MOONG::NETWORK::RETURN::SUCCESS;
-	}
-	else
-	{
-		/* then call WSACleanup when done using the Winsock dll */
-		WSACleanup();
-
-		return MOONG::NETWORK::RETURN::FAILURE::PING; // 통신 실패.
-	}
+	return FALSE;
 }
 
 int MOONG::NETWORK::Network::getAddrInfoFromURL(const std::string url, const std::string port, std::vector<ADDR_INFO> &param_addr_info) const
@@ -165,7 +83,7 @@ int MOONG::NETWORK::Network::getAddrInfoFromURL(const std::string url, const std
     iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (iResult != 0)
 	{
-        printf("WSAStartup failed[%d]\n", iResult);
+        //printf("WSAStartup failed[%d]\n", iResult);
 
         return 1;
     }
@@ -207,7 +125,7 @@ int MOONG::NETWORK::Network::getAddrInfoFromURL(const std::string url, const std
     dwRetval = getaddrinfo(url_for_func.c_str(), port.c_str(), &hints, &result);
     if ( dwRetval != 0 )
 	{
-        printf("getaddrinfo failed with error[%d]\n", dwRetval);
+        //printf("getaddrinfo failed with error[%d]\n", dwRetval);
 
         WSACleanup();
 
@@ -415,4 +333,189 @@ int MOONG::NETWORK::Network::getPortFromURL(const std::string url) const
 	}
 
 	return atoi(port.c_str());
+}
+
+
+
+
+
+BOOL MOONG::NETWORK::Network::Is_IPv4_Format_(const std::string IP) const
+{
+	std::vector<std::string> separated_IP;
+	const std::string delimit = ".";
+
+	char* token = NULL;
+#if _MSC_VER > 1200
+	char* next_token = NULL;
+
+	token = strtok_s((char*)(IP.c_str()), delimit.c_str(), &next_token);
+
+	while (token != NULL)
+	{
+		// Get next token:
+		if (token != NULL)
+		{
+			separated_IP.push_back(token);
+
+			token = strtok_s(NULL, delimit.c_str(), &next_token);
+		}
+	}
+#else
+	token = strtok((char*)(buf.c_str()), delimit.c_str());
+
+	while (token != NULL)
+	{
+		output.push_back(token);
+
+		// Get next token:
+		token = strtok(NULL, delimit.c_str()); // C4996
+	}
+#endif
+
+	if (separated_IP.size() == 4)
+	{
+		std::stringstream string_stream;
+		int temp_IP = 0;
+
+		for (size_t i = 0; i < separated_IP.size(); i++)
+		{
+			string_stream.clear();
+			string_stream.str(separated_IP[i]);
+
+			if (!string_stream.fail())
+			{
+				string_stream >> temp_IP;
+
+				if (temp_IP < 0 || temp_IP > 255)
+				{
+					return FALSE;
+				}
+			}
+			else
+			{
+				return FALSE;
+			}
+		}
+	}
+	else
+	{
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+int MOONG::NETWORK::Network::Ping_(const std::string IP, const unsigned int port/* = 80*/, const unsigned int param_timeout/* = 1*/) const
+{
+	WSADATA wsaData;
+	int err = 0;
+
+	err = WSAStartup(MAKEWORD(2, 2), &wsaData);
+	if (err != 0)
+	{
+		/* Tell the user that we could not find a usable */
+		/* Winsock DLL.                                  */
+		//printf("WSAStartup failed with error: %d\n", err);
+
+		return MOONG::NETWORK::RETURN::FAILURE::WSASTARTUP_FAILED;
+	}
+
+	/* Confirm that the WinSock DLL supports 2.2.*/
+	/* Note that if the DLL supports versions greater    */
+	/* than 2.2 in addition to 2.2, it will still return */
+	/* 2.2 in wVersion since that is the version we      */
+	/* requested.                                        */
+
+	if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2) {
+		/* Tell the user that we could not find a usable */
+		/* WinSock DLL.                                  */
+		//printf("Could not find a usable version of Winsock.dll\n");
+
+		WSACleanup();
+
+		return MOONG::NETWORK::RETURN::FAILURE::COULD_NOT_FIND_A_USABLE_VERSION_OF_WINSOCK_DLL;
+	}
+	else
+	{
+		//printf("The Winsock 2.2 dll was found okay\n");
+	}
+
+	/* The Winsock DLL is acceptable. Proceed to use it. */
+	/* Add network programming using Winsock here */
+	SOCKET sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	if (sock == INVALID_SOCKET)
+	{
+		return MOONG::NETWORK::RETURN::FAILURE::SOCKET_FUNCTION_CALL;
+	}
+
+#if _MSC_VER > 1200
+	struct sockaddr_in socket_address;
+
+	inet_pton(AF_INET, IP.c_str(), &socket_address.sin_addr.s_addr);
+
+	if (socket_address.sin_addr.s_addr == INADDR_NONE)
+	{
+		return MOONG::NETWORK::RETURN::FAILURE::INVALID_IP_FORM;
+	}
+#else
+	unsigned int addr = inet_addr(address.c_str());
+
+	if (addr == INADDR_NONE)
+	{
+		return MOONG::NETWORK::RETURN::FAILURE::INVALID_IP_FORM;
+	}
+
+	struct sockaddr_in socket_address;
+	socket_address.sin_addr.s_addr = addr;
+#endif
+	socket_address.sin_port = htons(port);
+	socket_address.sin_family = AF_INET;
+
+	// set the socket in non-blocking
+	unsigned long iMode = 1;
+	int return_value = ioctlsocket(sock, FIONBIO, &iMode);
+	if (return_value != NO_ERROR)
+	{
+		//printf("ioctlsocket set non-block failed with error[%d]\n", return_value);
+	}
+
+	if (connect(sock, (struct sockaddr*)&socket_address, sizeof(socket_address)) == false)
+	{
+		return MOONG::NETWORK::RETURN::FAILURE::SOCKET_CONNECT;
+	}
+
+	// set the socket in blocking
+	iMode = 0;
+	return_value = ioctlsocket(sock, FIONBIO, &iMode);
+	if (return_value != NO_ERROR)
+	{
+		//printf("ioctlsocket set block failed with error[%d]\n", return_value);
+	}
+
+	fd_set Write, Err;
+	FD_ZERO(&Write);
+	FD_ZERO(&Err);
+	FD_SET(sock, &Write);
+	FD_SET(sock, &Err);
+
+	TIMEVAL timeout;
+	timeout.tv_sec = param_timeout;
+	timeout.tv_usec = 0;
+
+	// check if the socket is ready
+	select(0, NULL, &Write, &Err, &timeout);
+	if (FD_ISSET(sock, &Write))
+	{
+		/* then call WSACleanup when done using the Winsock dll */
+		WSACleanup();
+
+		return MOONG::NETWORK::RETURN::SUCCESS;
+	}
+	else
+	{
+		/* then call WSACleanup when done using the Winsock dll */
+		WSACleanup();
+
+		return MOONG::NETWORK::RETURN::FAILURE::PING; // 통신 실패.
+	}
 }
