@@ -361,11 +361,11 @@ BOOL MOONG::NETWORK::Network::Is_IPv4_Format_(const std::string IP) const
 		}
 	}
 #else
-	token = strtok((char*)(buf.c_str()), delimit.c_str());
+	token = strtok((char*)(IP.c_str()), delimit.c_str());
 
 	while (token != NULL)
 	{
-		output.push_back(token);
+		separated_IP.push_back(token);
 
 		// Get next token:
 		token = strtok(NULL, delimit.c_str()); // C4996
@@ -458,7 +458,7 @@ int MOONG::NETWORK::Network::Ping_(const std::string IP, const unsigned int port
 		return MOONG::NETWORK::RETURN::FAILURE::INVALID_IP_FORM;
 	}
 #else
-	unsigned int addr = inet_addr(address.c_str());
+	unsigned int addr = inet_addr(IP.c_str());
 
 	if (addr == INADDR_NONE)
 	{
