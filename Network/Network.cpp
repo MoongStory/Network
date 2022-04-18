@@ -42,6 +42,7 @@ BOOL MOONG::NETWORK::Network::Ping(const std::string address, const unsigned int
 		{
 			for (size_t i = 0; i < addr_info.size(); i++)
 			{
+				//printf("IP Address[%s]\n", addr_info[i].getIPAddress().c_str());
 				if (this->Ping_(addr_info[i].getIPAddress(), port, timeout) == MOONG::NETWORK::RETURN::SUCCESS)
 				{
 					return TRUE;
@@ -374,24 +375,29 @@ BOOL MOONG::NETWORK::Network::Is_IPv4_Format_(const std::string IP) const
 
 	if (separated_IP.size() == 4)
 	{
-		std::stringstream string_stream;
 		int temp_IP = 0;
 
 		for (size_t i = 0; i < separated_IP.size(); i++)
 		{
-			string_stream.clear();
-			string_stream.str(separated_IP[i]);
-
-			if (!string_stream.fail())
+			if(separated_IP[i].length() > 3)
 			{
-				string_stream >> temp_IP;
+				return FALSE;
+			}
 
-				if (temp_IP < 0 || temp_IP > 255)
+			temp_IP = atoi(separated_IP[i].c_str());
+
+			if (temp_IP == 0)
+			{
+				for (size_t j = 0; separated_IP[i].length(); j++)
 				{
-					return FALSE;
+					if (separated_IP[i].at(j) < 0 || separated_IP[i].at(j) > 9)
+					{
+						return FALSE;
+					}
 				}
 			}
-			else
+
+			if (temp_IP < 0 || temp_IP > 255)
 			{
 				return FALSE;
 			}
