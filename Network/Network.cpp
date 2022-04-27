@@ -5,7 +5,15 @@
 
 #include <sstream>
 
-BOOL MOONG::NETWORK::Network::InternetConnected() const
+int MOONG::NETWORK::ADDR_INFO::flags_ = 0;
+std::string MOONG::NETWORK::ADDR_INFO::family_ = "";
+std::string MOONG::NETWORK::ADDR_INFO::ip_address_ = "";
+std::string MOONG::NETWORK::ADDR_INFO::socket_type_ = "";
+std::string MOONG::NETWORK::ADDR_INFO::protocol_ = "";
+size_t MOONG::NETWORK::ADDR_INFO::length_of_this_sockaddr_ = 0;
+std::string MOONG::NETWORK::ADDR_INFO::canonical_name_ = "";
+
+BOOL MOONG::NETWORK::Network::InternetConnected()
 {
 	DWORD dwFlag = 0;
 	TCHAR szName[256] = { 0 };
@@ -17,16 +25,16 @@ BOOL MOONG::NETWORK::Network::InternetConnected() const
 #endif
 }
 
-BOOL MOONG::NETWORK::Network::InternetConnected(const std::string param_url) const
+BOOL MOONG::NETWORK::Network::InternetConnected(const std::string param_url)
 {
 	return InternetCheckConnectionA(param_url.c_str(), FLAG_ICC_FORCE_CONNECTION, NULL) ? true : false;
 }
 
-BOOL MOONG::NETWORK::Network::Ping(const std::string address, const unsigned int port/* = 80*/, const unsigned int timeout/* = 1*/) const
+BOOL MOONG::NETWORK::Network::Ping(const std::string address, const unsigned int port/* = 80*/, const unsigned int timeout/* = 1*/)
 {
-	if (this->Is_IPv4_Format_(address))
+	if (MOONG::NETWORK::Network::Is_IPv4_Format_(address))
 	{
-		if (this->Ping_(address, port, timeout) == MOONG::NETWORK::RETURN::SUCCESS)
+		if (MOONG::NETWORK::Network::Ping_(address, port, timeout) == MOONG::NETWORK::RETURN::SUCCESS)
 		{
 			return TRUE;
 		}
@@ -38,12 +46,12 @@ BOOL MOONG::NETWORK::Network::Ping(const std::string address, const unsigned int
 	else
 	{
 		std::vector<MOONG::NETWORK::ADDR_INFO> addr_info;
-		if (this->getAddrInfoFromURL(address, port, addr_info) == MOONG::NETWORK::RETURN::SUCCESS)
+		if (MOONG::NETWORK::Network::getAddrInfoFromURL(address, port, addr_info) == MOONG::NETWORK::RETURN::SUCCESS)
 		{
 			for (size_t i = 0; i < addr_info.size(); i++)
 			{
 				//printf("IP Address[%s]\n", addr_info[i].getIPAddress().c_str());
-				if (this->Ping_(addr_info[i].getIPAddress(), port, timeout) == MOONG::NETWORK::RETURN::SUCCESS)
+				if (MOONG::NETWORK::Network::Ping_(addr_info[i].getIPAddress(), port, timeout) == MOONG::NETWORK::RETURN::SUCCESS)
 				{
 					return TRUE;
 				}
@@ -54,7 +62,7 @@ BOOL MOONG::NETWORK::Network::Ping(const std::string address, const unsigned int
 	return FALSE;
 }
 
-int MOONG::NETWORK::Network::getAddrInfoFromURL(const std::string url, const std::string port, std::vector<ADDR_INFO> &param_addr_info) const
+int MOONG::NETWORK::Network::getAddrInfoFromURL(const std::string url, const std::string port, std::vector<ADDR_INFO> &param_addr_info)
 {
 	// https://docs.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-getaddrinfo
     //-----------------------------------------
@@ -295,7 +303,7 @@ int MOONG::NETWORK::Network::getAddrInfoFromURL(const std::string url, const std
     return MOONG::NETWORK::RETURN::SUCCESS;
 }
 
-int MOONG::NETWORK::Network::getAddrInfoFromURL(const std::string url, const unsigned int port, std::vector<ADDR_INFO> &param_addr_info) const
+int MOONG::NETWORK::Network::getAddrInfoFromURL(const std::string url, const unsigned int port, std::vector<ADDR_INFO> &param_addr_info)
 {
 	char str_temp[64] = {0};
 #if _MSC_VER > 1200
@@ -304,10 +312,10 @@ int MOONG::NETWORK::Network::getAddrInfoFromURL(const std::string url, const uns
 	_itoa(port, str_temp, 10);
 #endif
 
-	return this->getAddrInfoFromURL(url, str_temp, param_addr_info);
+	return MOONG::NETWORK::Network::getAddrInfoFromURL(url, str_temp, param_addr_info);
 }
 
-int MOONG::NETWORK::Network::getPortFromURL(const std::string url) const
+int MOONG::NETWORK::Network::getPortFromURL(const std::string url)
 {
 	std::string port = url;
 
@@ -340,7 +348,7 @@ int MOONG::NETWORK::Network::getPortFromURL(const std::string url) const
 
 
 
-BOOL MOONG::NETWORK::Network::Is_IPv4_Format_(const std::string IP) const
+BOOL MOONG::NETWORK::Network::Is_IPv4_Format_(const std::string IP)
 {
 	std::vector<std::string> separated_IP;
 	const std::string delimit = ".";
@@ -411,7 +419,7 @@ BOOL MOONG::NETWORK::Network::Is_IPv4_Format_(const std::string IP) const
 	return TRUE;
 }
 
-int MOONG::NETWORK::Network::Ping_(const std::string IP, const unsigned int port/* = 80*/, const unsigned int param_timeout/* = 1*/) const
+int MOONG::NETWORK::Network::Ping_(const std::string IP, const unsigned int port/* = 80*/, const unsigned int param_timeout/* = 1*/)
 {
 	WSADATA wsaData;
 	int err = 0;

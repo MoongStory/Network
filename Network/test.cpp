@@ -5,8 +5,6 @@
 
 int main()
 {
-	MOONG::NETWORK::Network network;
-
 	const std::string URL = "https://www.google.com";
 	const std::string WRONG_URL = "https://www.something_wrong_url.com";
 	const std::string PORT = "80";
@@ -14,11 +12,11 @@ int main()
 	const int PORT_0 = 54321;
 	const int PORT_1 = 80;
 
-	std::cout << "Port from URL\n\t[" << network.getPortFromURL(URL) << "]" << std::endl;
+	std::cout << "Port from URL\n\t[" << MOONG::NETWORK::Network::getPortFromURL(URL) << "]" << std::endl;
 
 	std::cout << std::endl;
 
-	if (network.InternetConnected())
+	if (MOONG::NETWORK::Network::InternetConnected())
 	{
 		std::cout << "InternetConnected()\n\tSUCCESS" << std::endl;
 	}
@@ -29,7 +27,7 @@ int main()
 
 	std::cout << std::endl;
 
-	if (network.InternetConnected(URL))
+	if (MOONG::NETWORK::Network::InternetConnected(URL))
 	{
 		std::cout << "InternetConnected\n\taddress[" << URL.c_str() << "]\n\tSUCCESS" << std::endl;
 	}
@@ -40,7 +38,7 @@ int main()
 
 	std::cout << std::endl;
 
-	if (network.Ping(URL))
+	if (MOONG::NETWORK::Network::Ping(URL))
 	{
 		std::cout << "Ping\n\taddress[" << URL.c_str() << "]\n\tSUCCESS" << std::endl;
 	}
@@ -51,7 +49,7 @@ int main()
 
 	std::cout << std::endl;
 
-	if (network.Ping(URL, PORT_0))
+	if (MOONG::NETWORK::Network::Ping(URL, PORT_0))
 	{
 		std::cout << "Ping\n\taddress[" << URL.c_str() << "], Port[" << PORT_0 << "]\n\tSUCCESS" << std::endl;
 	}
@@ -62,7 +60,7 @@ int main()
 
 	std::cout << std::endl;
 
-	if (network.Ping(URL, PORT_1))
+	if (MOONG::NETWORK::Network::Ping(URL, PORT_1))
 	{
 		std::cout << "Ping\n\taddress[" << URL.c_str() << "], Port[" << PORT_1 << "]\n\tSUCCESS" << std::endl;
 	}
@@ -73,7 +71,7 @@ int main()
 
 	std::cout << std::endl;
 
-	if (network.Ping(WRONG_URL))
+	if (MOONG::NETWORK::Network::Ping(WRONG_URL))
 	{
 		std::cout << "Ping\n\taddress[" << WRONG_URL.c_str() << "]\n\tSUCCESS" << std::endl;
 	}
@@ -85,7 +83,7 @@ int main()
 	std::cout << std::endl;
 
 	std::vector<MOONG::NETWORK::ADDR_INFO> addr_info;
-	if (network.getAddrInfoFromURL(URL, PORT_1, addr_info) == MOONG::NETWORK::RETURN::SUCCESS)
+	if (MOONG::NETWORK::Network::getAddrInfoFromURL(URL, PORT_1, addr_info) == MOONG::NETWORK::RETURN::SUCCESS)
 	{
 		std::cout << "URL[" << URL.c_str() << "], PORT[" << PORT_1 << "] Information" << std::endl;
 		for(size_t i = 0; i < addr_info.size(); i++)
@@ -100,7 +98,7 @@ int main()
 
 			std::cout << std::endl;
 
-			if (network.Ping(addr_info[i].getIPAddress()))
+			if (MOONG::NETWORK::Network::Ping(addr_info[i].getIPAddress()))
 			{
 				std::cout << "Ping\n\taddress[" << addr_info[i].getIPAddress().c_str() << "]\n\tSUCCESS" << std::endl;
 			}
@@ -111,7 +109,7 @@ int main()
 
 			std::cout << std::endl;
 
-			if (network.Ping(addr_info[i].getIPAddress(), PORT_0))
+			if (MOONG::NETWORK::Network::Ping(addr_info[i].getIPAddress(), PORT_0))
 			{
 				std::cout << "Ping\n\taddress[" << addr_info[i].getIPAddress().c_str() << "], Port[" << PORT_0 << "]\n\tSUCCESS" << std::endl;
 			}
@@ -122,7 +120,7 @@ int main()
 
 			std::cout << std::endl;
 
-			if (network.Ping(addr_info[i].getIPAddress(), PORT_1))
+			if (MOONG::NETWORK::Network::Ping(addr_info[i].getIPAddress(), PORT_1))
 			{
 				std::cout << "Ping\n\taddress[" << addr_info[i].getIPAddress().c_str() << "], Port[" << PORT_1 << "]\n\tSUCCESS" << std::endl;
 			}
