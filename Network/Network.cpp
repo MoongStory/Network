@@ -13,7 +13,7 @@ std::string MOONG::NETWORK::ADDR_INFO::protocol_ = "";
 size_t MOONG::NETWORK::ADDR_INFO::length_of_this_sockaddr_ = 0;
 std::string MOONG::NETWORK::ADDR_INFO::canonical_name_ = "";
 
-BOOL MOONG::NETWORK::Network::InternetConnected()
+bool MOONG::Network::InternetConnected()
 {
 	DWORD dwFlag = 0;
 	TCHAR szName[256] = { 0 };
@@ -25,49 +25,49 @@ BOOL MOONG::NETWORK::Network::InternetConnected()
 #endif
 }
 
-BOOL MOONG::NETWORK::Network::InternetConnected(const std::string param_url)
+bool MOONG::Network::InternetConnected(const std::string param_url)
 {
 	return InternetCheckConnectionA(param_url.c_str(), FLAG_ICC_FORCE_CONNECTION, NULL) ? true : false;
 }
 
-BOOL MOONG::NETWORK::Network::Ping(const std::string address, const unsigned int port/* = 80*/, const unsigned int timeout/* = 1*/)
+bool MOONG::Network::Ping(const std::string address, const unsigned int port/* = 80*/, const unsigned int timeout/* = 1*/)
 {
-	if (MOONG::NETWORK::Network::Is_IPv4_Format_(address))
+	if (MOONG::Network::Is_IPv4_Format_(address))
 	{
-		if (MOONG::NETWORK::Network::Ping_(address, port, timeout) == MOONG::NETWORK::RETURN::SUCCESS)
+		if (MOONG::Network::Ping_(address, port, timeout) == MOONG::NETWORK::RETURN::SUCCESS)
 		{
-			return TRUE;
+			return true;
 		}
 		else
 		{
-			return FALSE;
+			return false;
 		}
 	}
 	else
 	{
 		std::vector<MOONG::NETWORK::ADDR_INFO> addr_info;
-		if (MOONG::NETWORK::Network::getAddrInfoFromURL(address, port, addr_info) == MOONG::NETWORK::RETURN::SUCCESS)
+		if (MOONG::Network::getAddrInfoFromURL(address, port, addr_info) == MOONG::NETWORK::RETURN::SUCCESS)
 		{
 			for (size_t i = 0; i < addr_info.size(); i++)
 			{
 				//printf("IP Address[%s]\n", addr_info[i].getIPAddress().c_str());
-				if (MOONG::NETWORK::Network::Ping_(addr_info[i].getIPAddress(), port, timeout) == MOONG::NETWORK::RETURN::SUCCESS)
+				if (MOONG::Network::Ping_(addr_info[i].getIPAddress(), port, timeout) == MOONG::NETWORK::RETURN::SUCCESS)
 				{
-					return TRUE;
+					return true;
 				}
 			}
 		}
 	}
 
-	return FALSE;
+	return false;
 }
 
-int MOONG::NETWORK::Network::getAddrInfoFromURL(const std::string url, const std::string port, std::vector<ADDR_INFO> &param_addr_info)
+int MOONG::Network::getAddrInfoFromURL(const std::string url, const std::string port, std::vector<MOONG::NETWORK::ADDR_INFO> &param_addr_info)
 {
 	// https://docs.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-getaddrinfo
     //-----------------------------------------
     // Declare and initialize variables
-	ADDR_INFO addr_info;
+	MOONG::NETWORK::ADDR_INFO addr_info;
 
     WSADATA wsaData = {0};
     int iResult = 0;
@@ -303,7 +303,7 @@ int MOONG::NETWORK::Network::getAddrInfoFromURL(const std::string url, const std
     return MOONG::NETWORK::RETURN::SUCCESS;
 }
 
-int MOONG::NETWORK::Network::getAddrInfoFromURL(const std::string url, const unsigned int port, std::vector<ADDR_INFO> &param_addr_info)
+int MOONG::Network::getAddrInfoFromURL(const std::string url, const unsigned int port, std::vector<MOONG::NETWORK::ADDR_INFO> &param_addr_info)
 {
 	char str_temp[64] = {0};
 #if _MSC_VER > 1200
@@ -312,10 +312,10 @@ int MOONG::NETWORK::Network::getAddrInfoFromURL(const std::string url, const uns
 	_itoa(port, str_temp, 10);
 #endif
 
-	return MOONG::NETWORK::Network::getAddrInfoFromURL(url, str_temp, param_addr_info);
+	return MOONG::Network::getAddrInfoFromURL(url, str_temp, param_addr_info);
 }
 
-int MOONG::NETWORK::Network::getPortFromURL(const std::string url)
+int MOONG::Network::getPortFromURL(const std::string url)
 {
 	std::string port = url;
 
@@ -348,7 +348,7 @@ int MOONG::NETWORK::Network::getPortFromURL(const std::string url)
 
 
 
-BOOL MOONG::NETWORK::Network::Is_IPv4_Format_(const std::string IP)
+bool MOONG::Network::Is_IPv4_Format_(const std::string IP)
 {
 	std::vector<std::string> separated_IP;
 	const std::string delimit = ".";
@@ -389,7 +389,7 @@ BOOL MOONG::NETWORK::Network::Is_IPv4_Format_(const std::string IP)
 		{
 			if(separated_IP[i].length() > 3)
 			{
-				return FALSE;
+				return false;
 			}
 
 			temp_IP = atoi(separated_IP[i].c_str());
@@ -400,26 +400,26 @@ BOOL MOONG::NETWORK::Network::Is_IPv4_Format_(const std::string IP)
 				{
 					if (separated_IP[i].at(j) < 0 || separated_IP[i].at(j) > 9)
 					{
-						return FALSE;
+						return false;
 					}
 				}
 			}
 
 			if (temp_IP < 0 || temp_IP > 255)
 			{
-				return FALSE;
+				return false;
 			}
 		}
 	}
 	else
 	{
-		return FALSE;
+		return false;
 	}
 
-	return TRUE;
+	return true;
 }
 
-int MOONG::NETWORK::Network::Ping_(const std::string IP, const unsigned int port/* = 80*/, const unsigned int param_timeout/* = 1*/)
+int MOONG::Network::Ping_(const std::string IP, const unsigned int port/* = 80*/, const unsigned int param_timeout/* = 1*/)
 {
 	WSADATA wsaData;
 	int err = 0;

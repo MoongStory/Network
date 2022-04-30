@@ -21,7 +21,7 @@ namespace MOONG
 		namespace RETURN
 		{
 			const int SUCCESS = 0;
-
+			
 			namespace FAILURE
 			{
 				static const int PING = 1;
@@ -33,7 +33,7 @@ namespace MOONG
 				static const int SOCKET_FUNCTION_CALL = 7;
 			}
 		}
-
+		
 		class ADDR_INFO
 		{
 		public:
@@ -46,7 +46,7 @@ namespace MOONG
 			static std::string protocol_;
 			static size_t length_of_this_sockaddr_;
 			static std::string canonical_name_;
-
+			
 		public:
 			void Clear()
 			{
@@ -58,7 +58,7 @@ namespace MOONG
 				MOONG::NETWORK::ADDR_INFO::length_of_this_sockaddr_ = 0;
 				MOONG::NETWORK::ADDR_INFO::canonical_name_.erase();
 			}
-
+			
 			int getFlags()
 			{
 				return MOONG::NETWORK::ADDR_INFO::flags_;
@@ -67,7 +67,7 @@ namespace MOONG
 			{
 				MOONG::NETWORK::ADDR_INFO::flags_ = flags;
 			}
-
+			
 			std::string getFamily()
 			{
 				return MOONG::NETWORK::ADDR_INFO::family_;
@@ -76,7 +76,7 @@ namespace MOONG
 			{
 				MOONG::NETWORK::ADDR_INFO::family_ = family;
 			}
-
+			
 			std::string getIPAddress()
 			{
 				return MOONG::NETWORK::ADDR_INFO::ip_address_;
@@ -85,7 +85,7 @@ namespace MOONG
 			{
 				MOONG::NETWORK::ADDR_INFO::ip_address_ = ip_address;
 			}
-
+			
 			std::string getSocketType()
 			{
 				return MOONG::NETWORK::ADDR_INFO::socket_type_;
@@ -94,7 +94,7 @@ namespace MOONG
 			{
 				MOONG::NETWORK::ADDR_INFO::socket_type_ = socket_type;
 			}
-
+			
 			std::string getProtocol()
 			{
 				return MOONG::NETWORK::ADDR_INFO::protocol_;
@@ -103,7 +103,7 @@ namespace MOONG
 			{
 				MOONG::NETWORK::ADDR_INFO::protocol_ = protocol;
 			}
-
+			
 			size_t getLengthOfThisSockaddr()
 			{
 				return MOONG::NETWORK::ADDR_INFO::length_of_this_sockaddr_;
@@ -112,7 +112,7 @@ namespace MOONG
 			{
 				MOONG::NETWORK::ADDR_INFO::length_of_this_sockaddr_ = length_of_this_sockaddr;
 			}
-
+			
 			std::string getCanonicalName()
 			{
 				return MOONG::NETWORK::ADDR_INFO::canonical_name_;
@@ -124,48 +124,48 @@ namespace MOONG
 		protected:
 		private:
 		};
-
-		class Network
-		{
-		public:
-			static BOOL InternetConnected();
-			static BOOL InternetConnected(const std::string param_url);
-
-			static BOOL Ping(const std::string address, const unsigned int port = 80, const unsigned int timeout = 1);
-
-			// return
-			//		MOONG::NETWORK::RETURN::SUCCESS
-			// param
-			//		host_name
-			//			URL.
-			//		port
-			//		param_addr_info
-			//			반환.
-			static int getAddrInfoFromURL(const std::string url, const std::string port, std::vector<ADDR_INFO> &param_addr_info);
-			static int getAddrInfoFromURL(const std::string url, const unsigned int port, std::vector<ADDR_INFO> &param_addr_info);
-
-			// return
-			//		포트 번호.
-			//		-1 : URL에 포트가 포함되어 있지 않은 경우.
-			// param
-			//		url
-			static int getPortFromURL(const std::string url);
-
-		protected:
-		private:
-			static BOOL Is_IPv4_Format_(const std::string IP);
-
-			// return
-			//		MOONG::NETWORK::RETURN::SUCCESS
-			//		MOONG::NETWORK::RETURN::FAILURE::PING
-			//		MOONG::NETWORK::RETURN::FAILURE::WSASTARTUP_FAILED
-			//		MOONG::NETWORK::RETURN::FAILURE::COULD_NOT_FIND_A_USABLE_VERSION_OF_WINSOCK_DLL
-			//		MOONG::NETWORK::RETURN::FAILURE::INVALID_IP_FORM
-			//		MOONG::NETWORK::RETURN::FAILURE::SOCKET_CONNECT
-			//		MOONG::NETWORK::RETURN::FAILURE::SOCKET_FUNCTION_CALL
-			static int Ping_(const std::string IP, const unsigned int port = 80, const unsigned int param_timeout = 1);
-		};
 	}
+	
+	class Network
+	{
+	public:
+		static bool InternetConnected();
+		static bool InternetConnected(const std::string param_url);
+		
+		static bool Ping(const std::string address, const unsigned int port = 80, const unsigned int timeout = 1);
+		
+		// return
+		//		MOONG::NETWORK::RETURN::SUCCESS
+		// param
+		//		host_name
+		//			URL.
+		//		port
+		//		param_addr_info
+		//			반환.
+		static int getAddrInfoFromURL(const std::string url, const std::string port, std::vector<MOONG::NETWORK::ADDR_INFO> &param_addr_info);
+		static int getAddrInfoFromURL(const std::string url, const unsigned int port, std::vector<MOONG::NETWORK::ADDR_INFO> &param_addr_info);
+		
+		// return
+		//		포트 번호.
+		//		-1 : URL에 포트가 포함되어 있지 않은 경우.
+		// param
+		//		url
+		static int getPortFromURL(const std::string url);
+		
+	protected:
+	private:
+		static bool Is_IPv4_Format_(const std::string IP);
+		
+		// return
+		//		MOONG::NETWORK::RETURN::SUCCESS
+		//		MOONG::NETWORK::RETURN::FAILURE::PING
+		//		MOONG::NETWORK::RETURN::FAILURE::WSASTARTUP_FAILED
+		//		MOONG::NETWORK::RETURN::FAILURE::COULD_NOT_FIND_A_USABLE_VERSION_OF_WINSOCK_DLL
+		//		MOONG::NETWORK::RETURN::FAILURE::INVALID_IP_FORM
+		//		MOONG::NETWORK::RETURN::FAILURE::SOCKET_CONNECT
+		//		MOONG::NETWORK::RETURN::FAILURE::SOCKET_FUNCTION_CALL
+		static int Ping_(const std::string IP, const unsigned int port = 80, const unsigned int param_timeout = 1);
+	};
 }
 
 #endif _NETWORK_H_
