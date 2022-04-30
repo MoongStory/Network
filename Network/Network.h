@@ -29,8 +29,7 @@ namespace MOONG
 				static const int COULD_NOT_FIND_A_USABLE_VERSION_OF_WINSOCK_DLL = 3;
 				static const int INVALID_IP_FORM = 4;
 				static const int SOCKET_CONNECT = 5;
-				static const int GET_HOST_BY_NAME = 6;
-				static const int SOCKET_FUNCTION_CALL = 7;
+				static const int SOCKET_FUNCTION_CALL = 6;
 			}
 		}
 		
