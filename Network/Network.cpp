@@ -315,35 +315,6 @@ int MOONG::Network::getAddrInfoFromURL(const std::string url, const unsigned int
 	return MOONG::Network::getAddrInfoFromURL(url, str_temp, param_addr_info);
 }
 
-int MOONG::Network::getPortFromURL(const std::string url)
-{
-	std::string port = url;
-
-	size_t position = port.find("://");
-	if(position != std::string::npos)
-	{
-		port = port.substr(position + strlen("://"));
-	}
-
-	position = port.find("/");
-	if(position != std::string::npos)
-	{
-		port = port.substr(0, position);
-	}
-
-	position = port.find(":");
-	if(position != std::string::npos)
-	{
-		port = port.substr(position + 1);
-	}
-	else
-	{
-		port = "-1";
-	}
-
-	return atoi(port.c_str());
-}
-
 
 
 

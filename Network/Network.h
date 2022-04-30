@@ -145,13 +145,6 @@ namespace MOONG
 		static int getAddrInfoFromURL(const std::string url, const std::string port, std::vector<MOONG::NETWORK::ADDR_INFO> &param_addr_info);
 		static int getAddrInfoFromURL(const std::string url, const unsigned int port, std::vector<MOONG::NETWORK::ADDR_INFO> &param_addr_info);
 		
-		// return
-		//		포트 번호.
-		//		-1 : URL에 포트가 포함되어 있지 않은 경우.
-		// param
-		//		url
-		static int getPortFromURL(const std::string url);
-		
 	protected:
 	private:
 		static bool Is_IPv4_Format_(const std::string IP);

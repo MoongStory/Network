@@ -3,16 +3,18 @@
 
 #include "Network.h"
 
+// https://github.com/MoongStory/Url
+#include "../../Url/Url/Url.h"
+
 int main()
 {
-	const std::string URL = "https://www.google.com";
+	const std::string URL = "https://www.google.com:80";
 	const std::string WRONG_URL = "https://www.something_wrong_url.com";
 	const std::string PORT = "80";
 
-	const int PORT_0 = 54321;
-	const int PORT_1 = 80;
+	const int TEST_PORT = 54321;
 
-	std::cout << "Port from URL\n\t[" << MOONG::Network::getPortFromURL(URL) << "]" << std::endl;
+	std::cout << "Port from URL\n\t[" << MOONG::Url::getPort(URL) << "]" << std::endl;
 
 	std::cout << std::endl;
 
@@ -49,24 +51,24 @@ int main()
 
 	std::cout << std::endl;
 
-	if (MOONG::Network::Ping(URL, PORT_0))
+	if (MOONG::Network::Ping(URL, TEST_PORT))
 	{
-		std::cout << "Ping\n\taddress[" << URL.c_str() << "], Port[" << PORT_0 << "]\n\tSUCCESS" << std::endl;
+		std::cout << "Ping\n\taddress[" << URL.c_str() << "], Port[" << TEST_PORT << "]\n\tSUCCESS" << std::endl;
 	}
 	else
 	{
-		std::cout << "Ping\n\taddress[" << URL.c_str() << "], Port[" << PORT_0 << "]\n\tFAIL" << std::endl;
+		std::cout << "Ping\n\taddress[" << URL.c_str() << "], Port[" << TEST_PORT << "]\n\tFAIL" << std::endl;
 	}
 
 	std::cout << std::endl;
 
-	if (MOONG::Network::Ping(URL, PORT_1))
+	if (MOONG::Network::Ping(URL, MOONG::Url::getPort(URL)))
 	{
-		std::cout << "Ping\n\taddress[" << URL.c_str() << "], Port[" << PORT_1 << "]\n\tSUCCESS" << std::endl;
+		std::cout << "Ping\n\taddress[" << URL.c_str() << "], Port[" << MOONG::Url::getPort(URL) << "]\n\tSUCCESS" << std::endl;
 	}
 	else
 	{
-		std::cout << "Ping\n\taddress[" << URL.c_str() << "], Port[" << PORT_1 << "]\n\tFAIL" << std::endl;
+		std::cout << "Ping\n\taddress[" << URL.c_str() << "], Port[" << MOONG::Url::getPort(URL) << "]\n\tFAIL" << std::endl;
 	}
 
 	std::cout << std::endl;
@@ -83,9 +85,9 @@ int main()
 	std::cout << std::endl;
 
 	std::vector<MOONG::NETWORK::ADDR_INFO> addr_info;
-	if (MOONG::Network::getAddrInfoFromURL(URL, PORT_1, addr_info) == MOONG::NETWORK::RETURN::SUCCESS)
+	if (MOONG::Network::getAddrInfoFromURL(URL, MOONG::Url::getPort(URL), addr_info) == MOONG::NETWORK::RETURN::SUCCESS)
 	{
-		std::cout << "URL[" << URL.c_str() << "], PORT[" << PORT_1 << "] Information" << std::endl;
+		std::cout << "URL[" << URL.c_str() << "], PORT[" << MOONG::Url::getPort(URL) << "] Information" << std::endl;
 		for(size_t i = 0; i < addr_info.size(); i++)
 		{
 			std::cout << "\tFlags[0x" << std::hex << addr_info[i].getFlags() << "]" << std::endl;
@@ -109,24 +111,24 @@ int main()
 
 			std::cout << std::endl;
 
-			if (MOONG::Network::Ping(addr_info[i].getIPAddress(), PORT_0))
+			if (MOONG::Network::Ping(addr_info[i].getIPAddress(), TEST_PORT))
 			{
-				std::cout << "Ping\n\taddress[" << addr_info[i].getIPAddress().c_str() << "], Port[" << PORT_0 << "]\n\tSUCCESS" << std::endl;
+				std::cout << "Ping\n\taddress[" << addr_info[i].getIPAddress().c_str() << "], Port[" << TEST_PORT << "]\n\tSUCCESS" << std::endl;
 			}
 			else
 			{
-				std::cout << "Ping\n\taddress[" << addr_info[i].getIPAddress().c_str() << "], Port[" << PORT_0 << "]\n\tFAIL" << std::endl;
+				std::cout << "Ping\n\taddress[" << addr_info[i].getIPAddress().c_str() << "], Port[" << TEST_PORT << "]\n\tFAIL" << std::endl;
 			}
 
 			std::cout << std::endl;
 
-			if (MOONG::Network::Ping(addr_info[i].getIPAddress(), PORT_1))
+			if (MOONG::Network::Ping(addr_info[i].getIPAddress(), MOONG::Url::getPort(URL)))
 			{
-				std::cout << "Ping\n\taddress[" << addr_info[i].getIPAddress().c_str() << "], Port[" << PORT_1 << "]\n\tSUCCESS" << std::endl;
+				std::cout << "Ping\n\taddress[" << addr_info[i].getIPAddress().c_str() << "], Port[" << MOONG::Url::getPort(URL) << "]\n\tSUCCESS" << std::endl;
 			}
 			else
 			{
-				std::cout << "Ping\n\taddress[" << addr_info[i].getIPAddress().c_str() << "], Port[" << PORT_1 << "]\n\tFAIL" << std::endl;
+				std::cout << "Ping\n\taddress[" << addr_info[i].getIPAddress().c_str() << "], Port[" << MOONG::Url::getPort(URL) << "]\n\tFAIL" << std::endl;
 			}
 		}
 	}
