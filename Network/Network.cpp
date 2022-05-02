@@ -19,7 +19,7 @@ bool MOONG::Network::InternetConnected()
 	TCHAR szName[256] = { 0 };
 
 #if _MSC_VER > 1200
-	return ::InternetGetConnectedStateEx(&dwFlag, szName, 256, 0);
+	return ::InternetGetConnectedStateEx(&dwFlag, szName, 256, 0) ? true : false;
 #else
 	return ::InternetGetConnectedStateEx(&dwFlag, szName, 256, 0) ? true : false;
 #endif
