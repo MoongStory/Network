@@ -17,68 +17,68 @@ int main()
 
 	std::cout << std::endl;
 
-	if (MOONG::Network::InternetConnected())
+	if (MOONG::Network::CheckConnectInternet())
 	{
-		std::cout << "InternetConnected()\n\tSUCCESS" << std::endl;
+		std::cout << "CheckConnectInternet()\n\tSUCCESS" << std::endl;
 	}
 	else
 	{
-		std::cout << "InternetConnected()\n\tFAIL" << std::endl;
+		std::cout << "CheckConnectInternet()\n\tFAIL" << std::endl;
 	}
 
 	std::cout << std::endl;
 
-	if (MOONG::Network::InternetConnected(URL))
+	if (MOONG::Network::CheckConnectInternet(URL))
 	{
-		std::cout << "InternetConnected\n\taddress[" << URL.c_str() << "]\n\tSUCCESS" << std::endl;
+		std::cout << "CheckConnectInternet\n\taddress[" << URL.c_str() << "]\n\tSUCCESS" << std::endl;
 	}
 	else
 	{
-		std::cout << "InternetConnected\n\taddress[" << URL.c_str() << "]\n\tFAIL" << std::endl;
+		std::cout << "CheckConnectInternet\n\taddress[" << URL.c_str() << "]\n\tFAIL" << std::endl;
 	}
 
 	std::cout << std::endl;
 
 	if (MOONG::Network::CheckConnectTCP(URL))
 	{
-		std::cout << "Ping\n\taddress[" << URL.c_str() << "]\n\tSUCCESS" << std::endl;
+		std::cout << "CheckConnectTCP\n\taddress[" << URL.c_str() << "]\n\tSUCCESS" << std::endl;
 	}
 	else
 	{
-		std::cout << "Ping\n\taddress[" << URL.c_str() << "]\n\tFAIL" << std::endl;
+		std::cout << "CheckConnectTCP\n\taddress[" << URL.c_str() << "]\n\tFAIL" << std::endl;
 	}
 
 	std::cout << std::endl;
 
 	if (MOONG::Network::CheckConnectTCP(URL, TEST_PORT))
 	{
-		std::cout << "Ping\n\taddress[" << URL.c_str() << "], Port[" << TEST_PORT << "]\n\tSUCCESS" << std::endl;
+		std::cout << "CheckConnectTCP\n\taddress[" << URL.c_str() << "], Port[" << TEST_PORT << "]\n\tSUCCESS" << std::endl;
 	}
 	else
 	{
-		std::cout << "Ping\n\taddress[" << URL.c_str() << "], Port[" << TEST_PORT << "]\n\tFAIL" << std::endl;
+		std::cout << "CheckConnectTCP\n\taddress[" << URL.c_str() << "], Port[" << TEST_PORT << "]\n\tFAIL" << std::endl;
 	}
 
 	std::cout << std::endl;
 
 	if (MOONG::Network::CheckConnectTCP(URL, MOONG::Url::getPort(URL)))
 	{
-		std::cout << "Ping\n\taddress[" << URL.c_str() << "], Port[" << MOONG::Url::getPort(URL) << "]\n\tSUCCESS" << std::endl;
+		std::cout << "CheckConnectTCP\n\taddress[" << URL.c_str() << "], Port[" << MOONG::Url::getPort(URL) << "]\n\tSUCCESS" << std::endl;
 	}
 	else
 	{
-		std::cout << "Ping\n\taddress[" << URL.c_str() << "], Port[" << MOONG::Url::getPort(URL) << "]\n\tFAIL" << std::endl;
+		std::cout << "CheckConnectTCP\n\taddress[" << URL.c_str() << "], Port[" << MOONG::Url::getPort(URL) << "]\n\tFAIL" << std::endl;
 	}
 
 	std::cout << std::endl;
 
 	if (MOONG::Network::CheckConnectTCP(WRONG_URL))
 	{
-		std::cout << "Ping\n\taddress[" << WRONG_URL.c_str() << "]\n\tSUCCESS" << std::endl;
+		std::cout << "CheckConnectTCP\n\taddress[" << WRONG_URL.c_str() << "]\n\tSUCCESS" << std::endl;
 	}
 	else
 	{
-		std::cout << "Ping\n\taddress[" << WRONG_URL.c_str() << "]\n\tFAIL" << std::endl;
+		std::cout << "CheckConnectTCP\n\taddress[" << WRONG_URL.c_str() << "]\n\tFAIL" << std::endl;
 	}
 
 	std::cout << std::endl;
@@ -101,33 +101,33 @@ int main()
 
 			if (MOONG::Network::CheckConnectTCP(addr_info[i].getIPAddress()))
 			{
-				std::cout << "Ping\n\taddress[" << addr_info[i].getIPAddress().c_str() << "]\n\tSUCCESS" << std::endl;
+				std::cout << "CheckConnectTCP\n\taddress[" << addr_info[i].getIPAddress().c_str() << "]\n\tSUCCESS" << std::endl;
 			}
 			else
 			{
-				std::cout << "Ping\n\taddress[" << addr_info[i].getIPAddress().c_str() << "]\n\tFAIL" << std::endl;
+				std::cout << "CheckConnectTCP\n\taddress[" << addr_info[i].getIPAddress().c_str() << "]\n\tFAIL" << std::endl;
 			}
 
 			std::cout << std::endl;
 
 			if (MOONG::Network::CheckConnectTCP(addr_info[i].getIPAddress(), TEST_PORT))
 			{
-				std::cout << "Ping\n\taddress[" << addr_info[i].getIPAddress().c_str() << "], Port[" << TEST_PORT << "]\n\tSUCCESS" << std::endl;
+				std::cout << "CheckConnectTCP\n\taddress[" << addr_info[i].getIPAddress().c_str() << "], Port[" << TEST_PORT << "]\n\tSUCCESS" << std::endl;
 			}
 			else
 			{
-				std::cout << "Ping\n\taddress[" << addr_info[i].getIPAddress().c_str() << "], Port[" << TEST_PORT << "]\n\tFAIL" << std::endl;
+				std::cout << "CheckConnectTCP\n\taddress[" << addr_info[i].getIPAddress().c_str() << "], Port[" << TEST_PORT << "]\n\tFAIL" << std::endl;
 			}
 
 			std::cout << std::endl;
 
 			if (MOONG::Network::CheckConnectTCP(addr_info[i].getIPAddress(), MOONG::Url::getPort(URL)))
 			{
-				std::cout << "Ping\n\taddress[" << addr_info[i].getIPAddress().c_str() << "], Port[" << MOONG::Url::getPort(URL) << "]\n\tSUCCESS" << std::endl;
+				std::cout << "CheckConnectTCP\n\taddress[" << addr_info[i].getIPAddress().c_str() << "], Port[" << MOONG::Url::getPort(URL) << "]\n\tSUCCESS" << std::endl;
 			}
 			else
 			{
-				std::cout << "Ping\n\taddress[" << addr_info[i].getIPAddress().c_str() << "], Port[" << MOONG::Url::getPort(URL) << "]\n\tFAIL" << std::endl;
+				std::cout << "CheckConnectTCP\n\taddress[" << addr_info[i].getIPAddress().c_str() << "], Port[" << MOONG::Url::getPort(URL) << "]\n\tFAIL" << std::endl;
 			}
 		}
 	}

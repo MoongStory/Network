@@ -128,8 +128,8 @@ namespace MOONG
 	class Network
 	{
 	public:
-		static bool InternetConnected();
-		static bool InternetConnected(const std::string param_url);
+		static bool CheckConnectInternet();
+		static bool CheckConnectInternet(const std::string param_url);
 		
 		static bool CheckConnectTCP(const std::string address, const unsigned int port = 80, const unsigned int timeout = 1);
 		

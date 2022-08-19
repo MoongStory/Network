@@ -13,7 +13,7 @@ std::string MOONG::NETWORK::ADDR_INFO::protocol_ = "";
 size_t MOONG::NETWORK::ADDR_INFO::length_of_this_sockaddr_ = 0;
 std::string MOONG::NETWORK::ADDR_INFO::canonical_name_ = "";
 
-bool MOONG::Network::InternetConnected()
+bool MOONG::Network::CheckConnectInternet()
 {
 	DWORD dwFlag = 0;
 	TCHAR szName[256] = { 0 };
@@ -25,7 +25,7 @@ bool MOONG::Network::InternetConnected()
 #endif
 }
 
-bool MOONG::Network::InternetConnected(const std::string param_url)
+bool MOONG::Network::CheckConnectInternet(const std::string param_url)
 {
 	return InternetCheckConnectionA(param_url.c_str(), FLAG_ICC_FORCE_CONNECTION, NULL) ? true : false;
 }
