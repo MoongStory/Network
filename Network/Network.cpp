@@ -30,11 +30,11 @@ bool MOONG::Network::InternetConnected(const std::string param_url)
 	return InternetCheckConnectionA(param_url.c_str(), FLAG_ICC_FORCE_CONNECTION, NULL) ? true : false;
 }
 
-bool MOONG::Network::Ping(const std::string address, const unsigned int port/* = 80*/, const unsigned int timeout/* = 1*/)
+bool MOONG::Network::CheckConnectTCP(const std::string address, const unsigned int port/* = 80*/, const unsigned int timeout/* = 1*/)
 {
 	if (MOONG::Network::Is_IPv4_Format_(address))
 	{
-		if (MOONG::Network::Ping_(address, port, timeout) == MOONG::NETWORK::RETURN::SUCCESS)
+		if (MOONG::Network::CheckConnectTCP_(address, port, timeout) == MOONG::NETWORK::RETURN::SUCCESS)
 		{
 			return true;
 		}
@@ -51,7 +51,7 @@ bool MOONG::Network::Ping(const std::string address, const unsigned int port/* =
 			for (size_t i = 0; i < addr_info.size(); i++)
 			{
 				//printf("IP Address[%s]\n", addr_info[i].getIPAddress().c_str());
-				if (MOONG::Network::Ping_(addr_info[i].getIPAddress(), port, timeout) == MOONG::NETWORK::RETURN::SUCCESS)
+				if (MOONG::Network::CheckConnectTCP_(addr_info[i].getIPAddress(), port, timeout) == MOONG::NETWORK::RETURN::SUCCESS)
 				{
 					return true;
 				}
@@ -390,7 +390,7 @@ bool MOONG::Network::Is_IPv4_Format_(const std::string IP)
 	return true;
 }
 
-int MOONG::Network::Ping_(const std::string IP, const unsigned int port/* = 80*/, const unsigned int param_timeout/* = 1*/)
+int MOONG::Network::CheckConnectTCP_(const std::string IP, const unsigned int port/* = 80*/, const unsigned int param_timeout/* = 1*/)
 {
 	WSADATA wsaData;
 	int err = 0;
@@ -494,6 +494,8 @@ int MOONG::Network::Ping_(const std::string IP, const unsigned int port/* = 80*/
 		/* then call WSACleanup when done using the Winsock dll */
 		WSACleanup();
 
+		closesocket(sock);
+
 		return MOONG::NETWORK::RETURN::SUCCESS;
 	}
 	else
@@ -501,6 +503,8 @@ int MOONG::Network::Ping_(const std::string IP, const unsigned int port/* = 80*/
 		/* then call WSACleanup when done using the Winsock dll */
 		WSACleanup();
 
-		return MOONG::NETWORK::RETURN::FAILURE::PING; // 통신 실패.
+		closesocket(sock);
+
+		return MOONG::NETWORK::RETURN::FAILURE::CONNECT_CHECK; // 통신 실패.
 	}
 }

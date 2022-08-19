@@ -39,7 +39,7 @@ int main()
 
 	std::cout << std::endl;
 
-	if (MOONG::Network::Ping(URL))
+	if (MOONG::Network::CheckConnectTCP(URL))
 	{
 		std::cout << "Ping\n\taddress[" << URL.c_str() << "]\n\tSUCCESS" << std::endl;
 	}
@@ -50,7 +50,7 @@ int main()
 
 	std::cout << std::endl;
 
-	if (MOONG::Network::Ping(URL, TEST_PORT))
+	if (MOONG::Network::CheckConnectTCP(URL, TEST_PORT))
 	{
 		std::cout << "Ping\n\taddress[" << URL.c_str() << "], Port[" << TEST_PORT << "]\n\tSUCCESS" << std::endl;
 	}
@@ -61,7 +61,7 @@ int main()
 
 	std::cout << std::endl;
 
-	if (MOONG::Network::Ping(URL, MOONG::Url::getPort(URL)))
+	if (MOONG::Network::CheckConnectTCP(URL, MOONG::Url::getPort(URL)))
 	{
 		std::cout << "Ping\n\taddress[" << URL.c_str() << "], Port[" << MOONG::Url::getPort(URL) << "]\n\tSUCCESS" << std::endl;
 	}
@@ -72,7 +72,7 @@ int main()
 
 	std::cout << std::endl;
 
-	if (MOONG::Network::Ping(WRONG_URL))
+	if (MOONG::Network::CheckConnectTCP(WRONG_URL))
 	{
 		std::cout << "Ping\n\taddress[" << WRONG_URL.c_str() << "]\n\tSUCCESS" << std::endl;
 	}
@@ -99,7 +99,7 @@ int main()
 
 			std::cout << std::endl;
 
-			if (MOONG::Network::Ping(addr_info[i].getIPAddress()))
+			if (MOONG::Network::CheckConnectTCP(addr_info[i].getIPAddress()))
 			{
 				std::cout << "Ping\n\taddress[" << addr_info[i].getIPAddress().c_str() << "]\n\tSUCCESS" << std::endl;
 			}
@@ -110,7 +110,7 @@ int main()
 
 			std::cout << std::endl;
 
-			if (MOONG::Network::Ping(addr_info[i].getIPAddress(), TEST_PORT))
+			if (MOONG::Network::CheckConnectTCP(addr_info[i].getIPAddress(), TEST_PORT))
 			{
 				std::cout << "Ping\n\taddress[" << addr_info[i].getIPAddress().c_str() << "], Port[" << TEST_PORT << "]\n\tSUCCESS" << std::endl;
 			}
@@ -121,7 +121,7 @@ int main()
 
 			std::cout << std::endl;
 
-			if (MOONG::Network::Ping(addr_info[i].getIPAddress(), MOONG::Url::getPort(URL)))
+			if (MOONG::Network::CheckConnectTCP(addr_info[i].getIPAddress(), MOONG::Url::getPort(URL)))
 			{
 				std::cout << "Ping\n\taddress[" << addr_info[i].getIPAddress().c_str() << "], Port[" << MOONG::Url::getPort(URL) << "]\n\tSUCCESS" << std::endl;
 			}

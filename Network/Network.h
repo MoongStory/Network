@@ -24,7 +24,7 @@ namespace MOONG
 			
 			namespace FAILURE
 			{
-				static const int PING = 1;
+				static const int CONNECT_CHECK = 1;
 				static const int WSASTARTUP_FAILED = 2;
 				static const int COULD_NOT_FIND_A_USABLE_VERSION_OF_WINSOCK_DLL = 3;
 				static const int INVALID_IP_FORM = 4;
@@ -131,7 +131,7 @@ namespace MOONG
 		static bool InternetConnected();
 		static bool InternetConnected(const std::string param_url);
 		
-		static bool Ping(const std::string address, const unsigned int port = 80, const unsigned int timeout = 1);
+		static bool CheckConnectTCP(const std::string address, const unsigned int port = 80, const unsigned int timeout = 1);
 		
 		// return
 		//		MOONG::NETWORK::RETURN::SUCCESS
@@ -150,13 +150,13 @@ namespace MOONG
 		
 		// return
 		//		MOONG::NETWORK::RETURN::SUCCESS
-		//		MOONG::NETWORK::RETURN::FAILURE::PING
+		//		MOONG::NETWORK::RETURN::FAILURE::CONNECT_CHECK
 		//		MOONG::NETWORK::RETURN::FAILURE::WSASTARTUP_FAILED
 		//		MOONG::NETWORK::RETURN::FAILURE::COULD_NOT_FIND_A_USABLE_VERSION_OF_WINSOCK_DLL
 		//		MOONG::NETWORK::RETURN::FAILURE::INVALID_IP_FORM
 		//		MOONG::NETWORK::RETURN::FAILURE::SOCKET_CONNECT
 		//		MOONG::NETWORK::RETURN::FAILURE::SOCKET_FUNCTION_CALL
-		static int Ping_(const std::string IP, const unsigned int port = 80, const unsigned int param_timeout = 1);
+		static int CheckConnectTCP_(const std::string IP, const unsigned int port = 80, const unsigned int param_timeout = 1);
 	};
 }
 
