@@ -430,6 +430,8 @@ int MOONG::Network::CheckConnectTCP_(const std::string IP, const unsigned int po
 	SOCKET sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (sock == INVALID_SOCKET)
 	{
+		WSACleanup();
+
 		return MOONG::NETWORK::RETURN::FAILURE::SOCKET_FUNCTION_CALL;
 	}
 
@@ -440,6 +442,8 @@ int MOONG::Network::CheckConnectTCP_(const std::string IP, const unsigned int po
 
 	if (socket_address.sin_addr.s_addr == INADDR_NONE)
 	{
+		WSACleanup();
+
 		return MOONG::NETWORK::RETURN::FAILURE::INVALID_IP_FORM;
 	}
 #else
@@ -447,6 +451,8 @@ int MOONG::Network::CheckConnectTCP_(const std::string IP, const unsigned int po
 
 	if (addr == INADDR_NONE)
 	{
+		WSACleanup();
+
 		return MOONG::NETWORK::RETURN::FAILURE::INVALID_IP_FORM;
 	}
 
@@ -466,6 +472,8 @@ int MOONG::Network::CheckConnectTCP_(const std::string IP, const unsigned int po
 
 	if (connect(sock, (struct sockaddr*)&socket_address, sizeof(socket_address)) == false)
 	{
+		WSACleanup();
+
 		return MOONG::NETWORK::RETURN::FAILURE::SOCKET_CONNECT;
 	}
 
