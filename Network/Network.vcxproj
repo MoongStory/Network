@@ -141,11 +141,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\ConvertString\ConvertString\ConvertString.cpp" />
     <ClCompile Include="..\..\Url\Url\Url.cpp" />
     <ClCompile Include="Network.cpp" />
     <ClCompile Include="test.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\ConvertString\ConvertString\ConvertString.h" />
     <ClInclude Include="..\..\Url\Url\Url.h" />
     <ClInclude Include="Network.h" />
   </ItemGroup>
