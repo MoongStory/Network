@@ -1,5 +1,8 @@
 #include "Network.h"
 
+// https://github.com/MoongStory/ConvertString
+#include "../../ConvertString/ConvertString/ConvertString.h"
+
 #include <WinInet.h>
 #pragma comment (lib, "WinInet.lib")
 
@@ -195,19 +198,7 @@ int MOONG::Network::getAddrInfoFromURL(const std::string url, const std::string 
 				{
 					if(ipstringbuffer != NULL)
 					{
-						const size_t new_size = (wcslen(ipstringbuffer) + 1) * 2;
-						char* nstring = new char[new_size];
-
-#if _MSC_VER > 1200
-						size_t convertedChars = 0;
-						wcstombs_s(&convertedChars, nstring, new_size, ipstringbuffer, _TRUNCATE);
-#else
-						wcstombs(nstring, ipstringbuffer, new_size);
-#endif
-
-						addr_info.setIPAddress(nstring);
-
-						delete[] nstring;
+						addr_info.setIPAddress(MOONG::ConvertString::wstring_to_string(ipstringbuffer));
 					}
 				}
                 break;
