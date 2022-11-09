@@ -24,7 +24,7 @@
     <ClCompile Include="..\..\Url\Url\Url.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\ConvertString\ConvertString\ConvertString.cpp">
+    <ClCompile Include="..\..\ConvertDataType\ConvertDataType\ConvertDataType.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
@@ -35,7 +35,7 @@
     <ClInclude Include="..\..\Url\Url\Url.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\ConvertString\ConvertString\ConvertString.h">
+    <ClInclude Include="..\..\ConvertDataType\ConvertDataType\ConvertDataType.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

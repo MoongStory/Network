@@ -1,7 +1,7 @@
 #include "Network.h"
 
-// https://github.com/MoongStory/ConvertString
-#include "../../ConvertString/ConvertString/ConvertString.h"
+// https://github.com/MoongStory/ConvertDataType
+#include "../../ConvertDataType/ConvertDataType/ConvertDataType.h"
 
 #include <WinInet.h>
 #pragma comment (lib, "WinInet.lib")
@@ -33,7 +33,7 @@ bool MOONG::Network::CheckConnectInternet(const std::string param_url)
 	return InternetCheckConnectionA(param_url.c_str(), FLAG_ICC_FORCE_CONNECTION, NULL) ? true : false;
 }
 
-bool MOONG::Network::CheckConnectTCP(const std::string address, const unsigned int port/* = 80*/, const unsigned int timeout/* = 1*/)
+bool MOONG::Network::CheckConnectTCP(const std::string address, const unsigned int port/* = 80*/, const unsigned int timeout/* = 1*/) noexcept(false)
 {
 	if (MOONG::Network::Is_IPv4_Format_(address))
 	{
@@ -48,24 +48,31 @@ bool MOONG::Network::CheckConnectTCP(const std::string address, const unsigned i
 	}
 	else
 	{
-		std::vector<MOONG::NETWORK::ADDR_INFO> addr_info;
-		if (MOONG::Network::getAddrInfoFromURL(address, port, addr_info) == MOONG::NETWORK::RETURN::SUCCESS)
+		try
 		{
-			for (size_t i = 0; i < addr_info.size(); i++)
+			std::vector<MOONG::NETWORK::ADDR_INFO> addr_info;
+			if (MOONG::Network::getAddrInfoFromURL(address, port, addr_info) == MOONG::NETWORK::RETURN::SUCCESS)
 			{
-				//printf("IP Address[%s]\n", addr_info[i].getIPAddress().c_str());
-				if (MOONG::Network::CheckConnectTCP_(addr_info[i].getIPAddress(), port, timeout) == MOONG::NETWORK::RETURN::SUCCESS)
+				for (size_t i = 0; i < addr_info.size(); i++)
 				{
-					return true;
+					//printf("IP Address[%s]\n", addr_info[i].getIPAddress().c_str());
+					if (MOONG::Network::CheckConnectTCP_(addr_info[i].getIPAddress(), port, timeout) == MOONG::NETWORK::RETURN::SUCCESS)
+					{
+						return true;
+					}
 				}
 			}
+		}
+		catch (const std::exception& exception)
+		{
+			throw exception;
 		}
 	}
 
 	return false;
 }
 
-int MOONG::Network::getAddrInfoFromURL(const std::string url, const std::string port, std::vector<MOONG::NETWORK::ADDR_INFO> &param_addr_info)
+int MOONG::Network::getAddrInfoFromURL(const std::string url, const std::string port, std::vector<MOONG::NETWORK::ADDR_INFO> &param_addr_info) noexcept(false)
 {
 	// https://docs.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-getaddrinfo
     //-----------------------------------------
@@ -97,7 +104,7 @@ int MOONG::Network::getAddrInfoFromURL(const std::string url, const std::string 
 	{
         //printf("WSAStartup failed[%d]\n", iResult);
 
-        return 1;
+		return MOONG::NETWORK::RETURN::FAILURE::WSASTARTUP_FAILED;
     }
 
     //--------------------------------
@@ -141,7 +148,7 @@ int MOONG::Network::getAddrInfoFromURL(const std::string url, const std::string 
 
         WSACleanup();
 
-        return 1;
+		return MOONG::NETWORK::RETURN::FAILURE::GETADDRINFO_FAILED;
     }
     
 	char IP[64] = {0};
@@ -198,7 +205,14 @@ int MOONG::Network::getAddrInfoFromURL(const std::string url, const std::string 
 				{
 					if(ipstringbuffer != NULL)
 					{
-						addr_info.setIPAddress(MOONG::ConvertString::wstring_to_string(ipstringbuffer));
+						try
+						{
+							addr_info.setIPAddress(MOONG::ConvertDataType::wstring_to_string(ipstringbuffer));
+						}
+						catch (const std::exception& exception)
+						{
+							throw exception;
+						}
 					}
 				}
                 break;
@@ -251,6 +265,7 @@ int MOONG::Network::getAddrInfoFromURL(const std::string url, const std::string 
 				temp += str_temp;
 				
 				addr_info.setSocketType(temp);
+
                 break;
         }
 
@@ -294,7 +309,7 @@ int MOONG::Network::getAddrInfoFromURL(const std::string url, const std::string 
     return MOONG::NETWORK::RETURN::SUCCESS;
 }
 
-int MOONG::Network::getAddrInfoFromURL(const std::string url, const unsigned int port, std::vector<MOONG::NETWORK::ADDR_INFO> &param_addr_info)
+int MOONG::Network::getAddrInfoFromURL(const std::string url, const unsigned int port, std::vector<MOONG::NETWORK::ADDR_INFO> &param_addr_info) noexcept(false)
 {
 	char str_temp[64] = {0};
 #if _MSC_VER > 1200
@@ -303,7 +318,14 @@ int MOONG::Network::getAddrInfoFromURL(const std::string url, const unsigned int
 	_itoa(port, str_temp, 10);
 #endif
 
-	return MOONG::Network::getAddrInfoFromURL(url, str_temp, param_addr_info);
+	try
+	{
+		return MOONG::Network::getAddrInfoFromURL(url, str_temp, param_addr_info);
+	}
+	catch (const std::exception& exception)
+	{
+		throw exception;
+	}
 }
 
 
