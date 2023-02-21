@@ -10,7 +10,7 @@ int main()
 {
 	try
 	{
-		const std::string URL = "https://www.google.com:80";
+		const std::string URL = "https://www.google.com";
 		const std::string WRONG_URL = "https://www.something_wrong_url.com";
 
 		const int TEST_PORT = 54321;

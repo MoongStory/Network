@@ -132,7 +132,7 @@ namespace MOONG
 		static bool CheckConnectInternet();
 		static bool CheckConnectInternet(const std::string param_url);
 
-		static bool CheckConnectTCP(const std::string address, const unsigned int port = 80, const unsigned int timeout = 1) noexcept(false);
+		static bool CheckConnectTCP(const std::string address, const unsigned int port = 80, const unsigned int timeout = 1);
 
 		// return
 		//		MOONG::NETWORK::RETURN::SUCCESS
@@ -142,8 +142,8 @@ namespace MOONG
 		//		port
 		//		param_addr_info
 		//			¹ÝÈ¯.
-		static int getAddrInfoFromURL(const std::string url, const std::string port, std::vector<MOONG::NETWORK::ADDR_INFO>& param_addr_info) noexcept(false);
-		static int getAddrInfoFromURL(const std::string url, const unsigned int port, std::vector<MOONG::NETWORK::ADDR_INFO>& param_addr_info) noexcept(false);
+		static int getAddrInfoFromURL(const std::string url, const std::string port, std::vector<MOONG::NETWORK::ADDR_INFO>& param_addr_info);
+		static int getAddrInfoFromURL(const std::string url, const unsigned int port, std::vector<MOONG::NETWORK::ADDR_INFO>& param_addr_info);
 
 	protected:
 	private:

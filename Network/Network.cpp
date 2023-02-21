@@ -1,6 +1,26 @@
+#if _MSC_VER <= 1200
+	#include <winsock2.h>
+	#include <atlbase.h>
+
+	//You may derive a class from CComModule and use it if you want to override
+	//something, but do not change the name of _Module
+	class CExeModule : public CComModule
+	{
+	public:
+		LONG Unlock();
+		DWORD dwThreadID;
+		HANDLE hEventShutdown;
+		void MonitorShutdown();
+		bool StartMonitor();
+		bool bActivity;
+	};
+	extern CExeModule _Module;
+
+	#include <atlcom.h>
+#endif
+
 #include "Network.h"
 
-// https://github.com/MoongStory/ConvertDataType
 #include "../../ConvertDataType/ConvertDataType/ConvertDataType.h"
 
 #include <WinInet.h>
@@ -33,7 +53,7 @@ bool MOONG::Network::CheckConnectInternet(const std::string param_url)
 	return InternetCheckConnectionA(param_url.c_str(), FLAG_ICC_FORCE_CONNECTION, NULL) ? true : false;
 }
 
-bool MOONG::Network::CheckConnectTCP(const std::string address, const unsigned int port/* = 80*/, const unsigned int timeout/* = 1*/) noexcept(false)
+bool MOONG::Network::CheckConnectTCP(const std::string address, const unsigned int port/* = 80*/, const unsigned int timeout/* = 1*/)
 {
 	if (MOONG::Network::Is_IPv4_Format_(address))
 	{
@@ -72,7 +92,7 @@ bool MOONG::Network::CheckConnectTCP(const std::string address, const unsigned i
 	return false;
 }
 
-int MOONG::Network::getAddrInfoFromURL(const std::string url, const std::string port, std::vector<MOONG::NETWORK::ADDR_INFO> &param_addr_info) noexcept(false)
+int MOONG::Network::getAddrInfoFromURL(const std::string url, const std::string port, std::vector<MOONG::NETWORK::ADDR_INFO> &param_addr_info)
 {
 	// https://docs.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-getaddrinfo
     //-----------------------------------------
@@ -309,7 +329,7 @@ int MOONG::Network::getAddrInfoFromURL(const std::string url, const std::string 
     return MOONG::NETWORK::RETURN::SUCCESS;
 }
 
-int MOONG::Network::getAddrInfoFromURL(const std::string url, const unsigned int port, std::vector<MOONG::NETWORK::ADDR_INFO> &param_addr_info) noexcept(false)
+int MOONG::Network::getAddrInfoFromURL(const std::string url, const unsigned int port, std::vector<MOONG::NETWORK::ADDR_INFO> &param_addr_info)
 {
 	char str_temp[64] = {0};
 #if _MSC_VER > 1200
