@@ -36,7 +36,7 @@ std::string MOONG::NETWORK::ADDR_INFO::protocol_ = "";
 size_t MOONG::NETWORK::ADDR_INFO::length_of_this_sockaddr_ = 0;
 std::string MOONG::NETWORK::ADDR_INFO::canonical_name_ = "";
 
-bool MOONG::Network::CheckConnectInternet()
+bool MOONG::Network::check_connect_internet()
 {
 	DWORD dwFlag = 0;
 	TCHAR szName[256] = { 0 };
@@ -48,16 +48,16 @@ bool MOONG::Network::CheckConnectInternet()
 #endif
 }
 
-bool MOONG::Network::CheckConnectInternet(const std::string param_url)
+bool MOONG::Network::check_connect_internet(const std::string param_url)
 {
 	return InternetCheckConnectionA(param_url.c_str(), FLAG_ICC_FORCE_CONNECTION, NULL) ? true : false;
 }
 
-bool MOONG::Network::CheckConnectTCP(const std::string address, const unsigned int port/* = 80*/, const unsigned int timeout/* = 1*/)
+bool MOONG::Network::check_connect_tcp(const std::string address, const unsigned int port/* = 80*/, const unsigned int timeout/* = 1*/)
 {
 	if (MOONG::Network::Is_IPv4_Format_(address))
 	{
-		if (MOONG::Network::CheckConnectTCP_(address, port, timeout) == MOONG::NETWORK::RETURN::SUCCESS)
+		if (MOONG::Network::check_connect_tcp_(address, port, timeout) == MOONG::NETWORK::RETURN::SUCCESS)
 		{
 			return true;
 		}
@@ -71,12 +71,12 @@ bool MOONG::Network::CheckConnectTCP(const std::string address, const unsigned i
 		try
 		{
 			std::vector<MOONG::NETWORK::ADDR_INFO> addr_info;
-			if (MOONG::Network::getAddrInfoFromURL(address, port, addr_info) == MOONG::NETWORK::RETURN::SUCCESS)
+			if (MOONG::Network::get_addr_Info_from_url(address, port, addr_info) == MOONG::NETWORK::RETURN::SUCCESS)
 			{
 				for (size_t i = 0; i < addr_info.size(); i++)
 				{
 					//printf("IP Address[%s]\n", addr_info[i].getIPAddress().c_str());
-					if (MOONG::Network::CheckConnectTCP_(addr_info[i].getIPAddress(), port, timeout) == MOONG::NETWORK::RETURN::SUCCESS)
+					if (MOONG::Network::check_connect_tcp_(addr_info[i].get_ip_address(), port, timeout) == MOONG::NETWORK::RETURN::SUCCESS)
 					{
 						return true;
 					}
@@ -92,7 +92,7 @@ bool MOONG::Network::CheckConnectTCP(const std::string address, const unsigned i
 	return false;
 }
 
-int MOONG::Network::getAddrInfoFromURL(const std::string url, const std::string port, std::vector<MOONG::NETWORK::ADDR_INFO> &param_addr_info)
+int MOONG::Network::get_addr_Info_from_url(const std::string url, const std::string port, std::vector<MOONG::NETWORK::ADDR_INFO> &param_addr_info)
 {
 	// https://docs.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-getaddrinfo
     //-----------------------------------------
@@ -176,26 +176,26 @@ int MOONG::Network::getAddrInfoFromURL(const std::string url, const std::string 
     // Retrieve each address and print out the hex bytes
     for(ptr = result; ptr != NULL; ptr = ptr->ai_next)
 	{
-		addr_info.Clear();
+		addr_info.clear();
 		ZeroMemory(IP, sizeof(IP));
 
-		addr_info.setFlags(ptr->ai_flags);
+		addr_info.set_flags(ptr->ai_flags);
         switch (ptr->ai_family) {
             case AF_UNSPEC:
-				addr_info.setFamily("Unspecified");
+				addr_info.set_family("Unspecified");
                 break;
             case AF_INET:
-				addr_info.setFamily("AF_INET (IPv4)");
+				addr_info.set_family("AF_INET (IPv4)");
                 sockaddr_ipv4 = (struct sockaddr_in *) ptr->ai_addr;
 #if _MSC_VER > 1200
 				inet_ntop(ptr->ai_family, &(sockaddr_ipv4->sin_addr), IP, sizeof(IP));
-				addr_info.setIPAddress(IP);
+				addr_info.set_ip_address(IP);
 #else
 				addr_info.setIPAddress(inet_ntoa(sockaddr_ipv4->sin_addr));
 #endif
                 break;
             case AF_INET6:
-				addr_info.setFamily("AF_INET6 (IPv6)");
+				addr_info.set_family("AF_INET6 (IPv6)");
                 // the InetNtop function is available on Windows Vista and later
                 // sockaddr_ipv6 = (struct sockaddr_in6 *) ptr->ai_addr;
                 // printf("\tIPv6 address %s\n",
@@ -219,7 +219,7 @@ int MOONG::Network::getAddrInfoFromURL(const std::string url, const std::string 
 					std::string temp = "WSAAddressToString failed with ";
 					temp += str_temp;
 
-					addr_info.setIPAddress(temp);
+					addr_info.set_ip_address(temp);
 				}
                 else    
 				{
@@ -227,7 +227,7 @@ int MOONG::Network::getAddrInfoFromURL(const std::string url, const std::string 
 					{
 						try
 						{
-							addr_info.setIPAddress(MOONG::ConvertDataType::wstring_to_string(ipstringbuffer));
+							addr_info.set_ip_address(MOONG::ConvertDataType::wstring_to_string(ipstringbuffer));
 						}
 						catch (const std::exception& exception)
 						{
@@ -237,7 +237,7 @@ int MOONG::Network::getAddrInfoFromURL(const std::string url, const std::string 
 				}
                 break;
             case AF_NETBIOS:
-				addr_info.setFamily("AF_NETBIOS (NetBIOS)");
+				addr_info.set_family("AF_NETBIOS (NetBIOS)");
                 break;
 			default:
 				char str_temp[256] = {0};
@@ -250,28 +250,28 @@ int MOONG::Network::getAddrInfoFromURL(const std::string url, const std::string 
 				std::string temp = "Other ";
 				temp += str_temp;
 
-				addr_info.setFamily(temp);
+				addr_info.set_family(temp);
                 break;
         }
 
         switch (ptr->ai_socktype) {
             case 0:
-				addr_info.setSocketType("Unspecified");
+				addr_info.set_socket_type("Unspecified");
                 break;
             case SOCK_STREAM:
-				addr_info.setSocketType("SOCK_STREAM (stream)");
+				addr_info.set_socket_type("SOCK_STREAM (stream)");
                 break;
             case SOCK_DGRAM:
-				addr_info.setSocketType("SOCK_DGRAM (datagram)");
+				addr_info.set_socket_type("SOCK_DGRAM (datagram)");
                 break;
             case SOCK_RAW:
-				addr_info.setSocketType("SOCK_RAW (raw)");
+				addr_info.set_socket_type("SOCK_RAW (raw)");
                 break;
             case SOCK_RDM:
-				addr_info.setSocketType("SOCK_RDM (reliable message datagram)");
+				addr_info.set_socket_type("SOCK_RDM (reliable message datagram)");
                 break;
             case SOCK_SEQPACKET:
-				addr_info.setSocketType("SOCK_SEQPACKET (pseudo-stream packet)");
+				addr_info.set_socket_type("SOCK_SEQPACKET (pseudo-stream packet)");
                 break;
             default:
 				char str_temp[256] = {0};
@@ -284,20 +284,20 @@ int MOONG::Network::getAddrInfoFromURL(const std::string url, const std::string 
 				std::string temp = "Other ";
 				temp += str_temp;
 				
-				addr_info.setSocketType(temp);
+				addr_info.set_socket_type(temp);
 
                 break;
         }
 
         switch (ptr->ai_protocol) {
             case 0:
-				addr_info.setProtocol("Unspecified");
+				addr_info.set_protocol("Unspecified");
                 break;
             case IPPROTO_TCP:
-				addr_info.setProtocol("IPPROTO_TCP (TCP)");
+				addr_info.set_protocol("IPPROTO_TCP (TCP)");
                 break;
             case IPPROTO_UDP:
-				addr_info.setProtocol("IPPROTO_UDP (UDP)");
+				addr_info.set_protocol("IPPROTO_UDP (UDP)");
                 break;
             default:
 				char str_temp[256] = {0};
@@ -310,13 +310,13 @@ int MOONG::Network::getAddrInfoFromURL(const std::string url, const std::string 
 				std::string temp = "Other ";
 				temp += str_temp;
 
-				addr_info.setProtocol(temp);
+				addr_info.set_protocol(temp);
                 break;
         }
-		addr_info.setLengthOfThisSockaddr(ptr->ai_addrlen);
+		addr_info.set_length_of_this_sock_addr(ptr->ai_addrlen);
 		if(ptr->ai_canonname != NULL)
 		{
-			addr_info.setCanonicalName(ptr->ai_canonname);
+			addr_info.set_canonical_name(ptr->ai_canonname);
 		}
 
 		param_addr_info.push_back(addr_info);
@@ -329,7 +329,7 @@ int MOONG::Network::getAddrInfoFromURL(const std::string url, const std::string 
     return MOONG::NETWORK::RETURN::SUCCESS;
 }
 
-int MOONG::Network::getAddrInfoFromURL(const std::string url, const unsigned int port, std::vector<MOONG::NETWORK::ADDR_INFO> &param_addr_info)
+int MOONG::Network::get_addr_Info_from_url(const std::string url, const unsigned int port, std::vector<MOONG::NETWORK::ADDR_INFO> &param_addr_info)
 {
 	char str_temp[64] = {0};
 #if _MSC_VER > 1200
@@ -340,7 +340,7 @@ int MOONG::Network::getAddrInfoFromURL(const std::string url, const unsigned int
 
 	try
 	{
-		return MOONG::Network::getAddrInfoFromURL(url, str_temp, param_addr_info);
+		return MOONG::Network::get_addr_Info_from_url(url, str_temp, param_addr_info);
 	}
 	catch (const std::exception& exception)
 	{
@@ -423,7 +423,7 @@ bool MOONG::Network::Is_IPv4_Format_(const std::string IP)
 	return true;
 }
 
-int MOONG::Network::CheckConnectTCP_(const std::string IP, const unsigned int port/* = 80*/, const unsigned int param_timeout/* = 1*/)
+int MOONG::Network::check_connect_tcp_(const std::string IP, const unsigned int port/* = 80*/, const unsigned int param_timeout/* = 1*/)
 {
 	WSADATA wsaData;
 	int err = 0;
