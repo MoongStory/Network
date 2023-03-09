@@ -171,7 +171,7 @@ namespace MOONG
 
 	protected:
 	private:
-		static bool Is_IPv4_Format_(const std::string IP);
+		static bool is_ip_v4_format_(const std::string IP);
 
 		// return
 		//		MOONG::NETWORK::RETURN::SUCCESS

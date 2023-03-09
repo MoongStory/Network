@@ -55,7 +55,7 @@ bool MOONG::Network::check_connect_internet(const std::string param_url)
 
 bool MOONG::Network::check_connect_tcp(const std::string address, const unsigned int port/* = 80*/, const unsigned int timeout/* = 1*/)
 {
-	if (MOONG::Network::Is_IPv4_Format_(address))
+	if (MOONG::Network::is_ip_v4_format_(address))
 	{
 		if (MOONG::Network::check_connect_tcp_(address, port, timeout) == MOONG::NETWORK::RETURN::SUCCESS)
 		{
@@ -191,7 +191,7 @@ int MOONG::Network::get_addr_Info_from_url(const std::string url, const std::str
 				inet_ntop(ptr->ai_family, &(sockaddr_ipv4->sin_addr), IP, sizeof(IP));
 				addr_info.set_ip_address(IP);
 #else
-				addr_info.setIPAddress(inet_ntoa(sockaddr_ipv4->sin_addr));
+				addr_info.set_ip_address(inet_ntoa(sockaddr_ipv4->sin_addr));
 #endif
                 break;
             case AF_INET6:
@@ -352,7 +352,7 @@ int MOONG::Network::get_addr_Info_from_url(const std::string url, const unsigned
 
 
 
-bool MOONG::Network::Is_IPv4_Format_(const std::string IP)
+bool MOONG::Network::is_ip_v4_format_(const std::string IP)
 {
 	std::vector<std::string> separated_IP;
 	const std::string delimit = ".";

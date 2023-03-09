@@ -15,7 +15,7 @@ int main()
 
 		const int TEST_PORT = 54321;
 
-		std::cout << "Port from URL\n\t[" << MOONG::Url::getPort(URL) << "]" << std::endl;
+		std::cout << "Port from URL\n\t[" << MOONG::Url::get_port(URL) << "]" << std::endl;
 
 		std::cout << std::endl;
 
@@ -63,13 +63,13 @@ int main()
 
 		std::cout << std::endl;
 
-		if (MOONG::Network::check_connect_tcp(URL, MOONG::Url::getPort(URL)))
+		if (MOONG::Network::check_connect_tcp(URL, MOONG::Url::get_port(URL)))
 		{
-			std::cout << "CheckConnectTCP\n\taddress[" << URL.c_str() << "], Port[" << MOONG::Url::getPort(URL) << "]\n\tSUCCESS" << std::endl;
+			std::cout << "CheckConnectTCP\n\taddress[" << URL.c_str() << "], Port[" << MOONG::Url::get_port(URL) << "]\n\tSUCCESS" << std::endl;
 		}
 		else
 		{
-			std::cout << "CheckConnectTCP\n\taddress[" << URL.c_str() << "], Port[" << MOONG::Url::getPort(URL) << "]\n\tFAIL" << std::endl;
+			std::cout << "CheckConnectTCP\n\taddress[" << URL.c_str() << "], Port[" << MOONG::Url::get_port(URL) << "]\n\tFAIL" << std::endl;
 		}
 
 		std::cout << std::endl;
@@ -86,9 +86,9 @@ int main()
 		std::cout << std::endl;
 
 		std::vector<MOONG::NETWORK::ADDR_INFO> addr_info;
-		if (MOONG::Network::get_addr_Info_from_url(URL, MOONG::Url::getPort(URL), addr_info) == MOONG::NETWORK::RETURN::SUCCESS)
+		if (MOONG::Network::get_addr_Info_from_url(URL, MOONG::Url::get_port(URL), addr_info) == MOONG::NETWORK::RETURN::SUCCESS)
 		{
-			std::cout << "URL[" << URL.c_str() << "], PORT[" << MOONG::Url::getPort(URL) << "] Information" << std::endl;
+			std::cout << "URL[" << URL.c_str() << "], PORT[" << MOONG::Url::get_port(URL) << "] Information" << std::endl;
 			for (size_t i = 0; i < addr_info.size(); i++)
 			{
 				std::cout << "\tFlags[0x" << std::hex << addr_info[i].get_flags() << "]" << std::endl;
@@ -123,13 +123,13 @@ int main()
 
 				std::cout << std::endl;
 
-				if (MOONG::Network::check_connect_tcp(addr_info[i].get_ip_address(), MOONG::Url::getPort(URL)))
+				if (MOONG::Network::check_connect_tcp(addr_info[i].get_ip_address(), MOONG::Url::get_port(URL)))
 				{
-					std::cout << "CheckConnectTCP\n\taddress[" << addr_info[i].get_ip_address().c_str() << "], Port[" << MOONG::Url::getPort(URL) << "]\n\tSUCCESS" << std::endl;
+					std::cout << "CheckConnectTCP\n\taddress[" << addr_info[i].get_ip_address().c_str() << "], Port[" << MOONG::Url::get_port(URL) << "]\n\tSUCCESS" << std::endl;
 				}
 				else
 				{
-					std::cout << "CheckConnectTCP\n\taddress[" << addr_info[i].get_ip_address().c_str() << "], Port[" << MOONG::Url::getPort(URL) << "]\n\tFAIL" << std::endl;
+					std::cout << "CheckConnectTCP\n\taddress[" << addr_info[i].get_ip_address().c_str() << "], Port[" << MOONG::Url::get_port(URL) << "]\n\tFAIL" << std::endl;
 				}
 			}
 		}
