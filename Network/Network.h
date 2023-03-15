@@ -31,12 +31,32 @@ SOFTWARE.
 #ifndef _NETWORK_H_
 #define _NETWORK_H_
 
+#if _MSC_VER <= 1200
+	#include <winsock2.h>
+	#include <atlbase.h>
+
+	//You may derive a class from CComModule and use it if you want to override
+	//something, but do not change the name of _Module
+	class CExeModule : public CComModule
+	{
+	public:
+		LONG Unlock();
+		DWORD dwThreadID;
+		HANDLE hEventShutdown;
+		void MonitorShutdown();
+		bool StartMonitor();
+		bool bActivity;
+	};
+	extern CExeModule _Module;
+
+	#include <atlcom.h>
+#endif
+
 #include <ws2tcpip.h>
 #pragma comment (lib, "Ws2_32.lib")
 
 #include <iostream>
 #include <vector>
-#include <windows.h>
 
 namespace MOONG
 {

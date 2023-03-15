@@ -1,5 +1,4 @@
 #include <iostream>
-#include <atlstr.h>
 
 #include "Network.h"
 

@@ -1,29 +1,8 @@
-#if _MSC_VER <= 1200
-	#include <winsock2.h>
-	#include <atlbase.h>
-
-	//You may derive a class from CComModule and use it if you want to override
-	//something, but do not change the name of _Module
-	class CExeModule : public CComModule
-	{
-	public:
-		LONG Unlock();
-		DWORD dwThreadID;
-		HANDLE hEventShutdown;
-		void MonitorShutdown();
-		bool StartMonitor();
-		bool bActivity;
-	};
-	extern CExeModule _Module;
-
-	#include <atlcom.h>
-#endif
+#include "Network.h"
 
 #if _MSC_VER >= 1700
 	#include <regex>
 #endif
-
-#include "Network.h"
 
 #include "../../ConvertDataType/ConvertDataType/ConvertDataType.h"
 
