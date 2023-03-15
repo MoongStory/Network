@@ -169,9 +169,9 @@ namespace MOONG
 		static int get_addr_Info_from_url(const std::string url, const std::string port, std::vector<MOONG::NETWORK::ADDR_INFO>& param_addr_info);
 		static int get_addr_Info_from_url(const std::string url, const unsigned int port, std::vector<MOONG::NETWORK::ADDR_INFO>& param_addr_info);
 
+		static bool is_ip_v4_format(const std::string IP);
 	protected:
 	private:
-		static bool is_ip_v4_format_(const std::string IP);
 
 		// return
 		//		MOONG::NETWORK::RETURN::SUCCESS

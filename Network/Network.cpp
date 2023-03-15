@@ -19,6 +19,10 @@
 	#include <atlcom.h>
 #endif
 
+#if _MSC_VER >= 1700
+	#include <regex>
+#endif
+
 #include "Network.h"
 
 #include "../../ConvertDataType/ConvertDataType/ConvertDataType.h"
@@ -55,7 +59,7 @@ bool MOONG::Network::check_connect_internet(const std::string param_url)
 
 bool MOONG::Network::check_connect_tcp(const std::string address, const unsigned int port/* = 80*/, const unsigned int timeout/* = 1*/)
 {
-	if (MOONG::Network::is_ip_v4_format_(address))
+	if (MOONG::Network::is_ip_v4_format(address))
 	{
 		if (MOONG::Network::check_connect_tcp_(address, port, timeout) == MOONG::NETWORK::RETURN::SUCCESS)
 		{
@@ -352,8 +356,20 @@ int MOONG::Network::get_addr_Info_from_url(const std::string url, const unsigned
 
 
 
-bool MOONG::Network::is_ip_v4_format_(const std::string IP)
+bool MOONG::Network::is_ip_v4_format(const std::string IP)
 {
+#if _MSC_VER >= 1700
+	std::regex ip_v4_format("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$");
+
+	if (std::regex_match(IP, ip_v4_format))
+	{
+		return true;;
+	}
+	else
+	{
+		return false;
+	}
+#else
 	std::vector<std::string> separated_IP;
 	const std::string delimit = ".";
 
@@ -421,6 +437,7 @@ bool MOONG::Network::is_ip_v4_format_(const std::string IP)
 	}
 
 	return true;
+#endif
 }
 
 int MOONG::Network::check_connect_tcp_(const std::string IP, const unsigned int port/* = 80*/, const unsigned int param_timeout/* = 1*/)
