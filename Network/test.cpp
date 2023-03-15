@@ -3,7 +3,6 @@
 
 #include "Network.h"
 
-// https://github.com/MoongStory/Url
 #include "../../Url/Url/Url.h"
 
 int main()
